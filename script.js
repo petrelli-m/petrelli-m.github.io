@@ -35,17 +35,6 @@ function mixRgb(a, b, t) {
   return [lerp(a[0], b[0], t), lerp(a[1], b[1], t), lerp(a[2], b[2], t)];
 }
 
-// Seeded random numbers, so each figure looks the same on every visit
-function seededRandom(seed) {
-  let s = seed;
-  return function random() {
-    s = (s + 0x6D2B79F5) | 0;
-    let t = Math.imul(s ^ (s >>> 15), 1 | s);
-    t = (t + Math.imul(t ^ (t >>> 7), 61 | t)) ^ t;
-    return ((t ^ (t >>> 14)) >>> 0) / 4294967296;
-  };
-}
-
 // Colours from style.css, as seen by a given element (light or dark band)
 function themeColours(element) {
   const css = getComputedStyle(element);
@@ -89,9 +78,9 @@ function fitCanvas(canvas) {
    doi:10.1038/s41467-026-77213-9.
    Left: the paper's Fig. 5 crystal from the 2021 Tajogaite eruption
    (data/cpx-map.js), shown as Cr, Sc and Zr maps, then coloured by
-   cluster. Only clusters covering at least 5% of the crystal are used;
-   each pixel takes the nearest of their published means on eight
-   trace elements, worked out by tools/build_data.py.
+   cluster. Only clusters 0, 2 and 5 are used; each pixel takes the
+   nearest of their published means on eight trace elements, and
+   isolated pixels are cleaned away, by tools/build_data.py.
    Right: depth and temperature of the spot analyses in those clusters
    (data/cpx-spots.js), from the machine-learning clinopyroxene-only
    thermobarometer of Ágreda-López et al. (2024), Computers &
@@ -119,11 +108,11 @@ function createCrystalMap(canvas, readout, defaultReadout, spotData, mapData) {
   // Cluster colours as in the paper (Okabe–Ito, readable with colour-blindness)
   const CLUSTER_RGB = ['#E69F00', '#56B4E9', '#009E73', '#F0E442', '#0072B2', '#D55E00'].map(hexToRgb);
 
-  // Clusters used: those covering at least 5% of the crystal (set in data/cpx-map.js)
+  // Clusters used (set in tools/build_data.py and listed in data/cpx-map.js)
   const USED = mapData.clusters;
 
-  // The order in which the clusters appear: core to rim, after the paper's model (Fig. 9).
-  // Clusters not used are left out, and so are steps left empty.
+  // The order in which the clusters appear: core to rim (0, 5, 2), after the paper's
+  // model (Fig. 9). Clusters not used are left out, and so are steps left empty.
   const STEPS = [
     { title: 'Evolved cores', clusters: [0, 1, 4] },
     { title: 'Basanite recharge', clusters: [5] },
@@ -295,15 +284,13 @@ function createCrystalMap(canvas, readout, defaultReadout, spotData, mapData) {
   const T_SCAN = 2000;              // laser maps the crystal, Cr first
   const T_SC = [2300, 2700];        // colour scale changes to Sc
   const T_ZR = [2900, 3300];        // then to Zr
-  const T_ASSIGN = 3600;            // pixels take their cluster colour
-  const ASSIGN_SPAN = 1100;
+  const T_ASSIGN = 3600;            // all pixels fade to their cluster colour together
+  const ASSIGN_SPAN = 900;
   const T_STEPS = 5300;             // clusters appear in the plot, core to rim
   const STEP_SPAN = 1300;
   const T_ALL = T_STEPS + STEPS.length * STEP_SPAN;
   const T_END = T_ALL + 500;
 
-  const random = seededRandom(2021);
-  pixels.forEach(p => { p.assignAt = T_ASSIGN + random() * ASSIGN_SPAN; });
 
   /* --- Drawing ---------------------------------------------------- */
 
@@ -344,7 +331,7 @@ function createCrystalMap(canvas, readout, defaultReadout, spotData, mapData) {
   const toY = d => layout.plot.y + ((d - PLOT.d0) / (PLOT.d1 - PLOT.d0)) * layout.plot.h;
   const gridX = i => toX(PLOT.t0 + (i + 0.5) * cellT);
   const gridY = j => toY(PLOT.d0 + (j + 0.5) * cellD);
-  const assigned = (p, t) => easeOut(clamp01((t - p.assignAt) / 400));
+  const assigned = t => easeOut(clamp01((t - T_ASSIGN) / ASSIGN_SPAN));
   const stepShown = (s, t) => easeOut(clamp01((t - T_STEPS - s * STEP_SPAN) / 500));
 
   // Clusters in focus: those appearing, or the one under the pointer; null = all
@@ -374,7 +361,7 @@ function createCrystalMap(canvas, readout, defaultReadout, spotData, mapData) {
     pixels.forEach(p => {
       if (p.j >= revealed) return;
       let rgb = mixRgb(mixRgb(p.scale[0], p.scale[1], scMix), p.scale[2], zrMix);
-      rgb = mixRgb(rgb, CLUSTER_RGB[p.cluster], assigned(p, t));
+      rgb = mixRgb(rgb, CLUSTER_RGB[p.cluster], assigned(t));
       if (mapFocus && !mapFocus.includes(p.cluster)) {
         const grey = 0.3 * rgb[0] + 0.59 * rgb[1] + 0.11 * rgb[2];
         rgb = mixRgb([grey, grey, grey], colours.paper, 0.72);

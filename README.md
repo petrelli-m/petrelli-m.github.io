@@ -29,16 +29,17 @@ Plain HTML, CSS and JavaScript. No framework, no build step.
   doi:10.1038/s41467-026-77213-9, from their repository
   (https://github.com/AlbCaracc/Caracciolo_et_al_2026_CumbreVieja):
   - `data/cpx-map.js`: the calibrated map of Tajogaite crystal 5 (their Fig. 5), averaged to 6 µm pixels.
-    Only clusters covering at least 5% of the crystal are used (0, 1, 2 and 5; set by `MIN_SHARE`
-    in `tools/build_data.py`). Each pixel takes the nearest of their published means on Sc, Ti, V,
-    Cr, Mn, Ni, Sr and Zr (log-transformed and standardised over the spots); with all six means,
-    93% of the 316 spots fall in their published cluster.
+    Only clusters 0, 2 and 5 are used (`USE_CLUSTERS` in `tools/build_data.py`). Each pixel takes the
+    nearest of their published means on Sc, Ti, V, Cr, Mn, Ni, Sr and Zr (log-transformed and
+    standardised over the spots); with all six means, 93% of the 316 spots fall in their published
+    cluster. Crystal fragments under 6 pixels are dropped and cluster patches under 4 pixels take
+    the cluster around them (`MIN_FRAGMENT`, `MIN_PATCH`), so no isolated pixels are shown.
   - `data/cpx-spots.js`: the 316 spot analyses with their clusters, and pressure and temperature
     from the machine-learning clinopyroxene-only thermobarometer of Ágreda-López et al. (2024),
     Computers & Geosciences 193, 105707 (284 spots; 32 microlites have no EMPA analysis).
-  - The right panel shows the 196 spots in the four clusters used and draws, for each cluster, a kernel density contour holding 90% of its
-    spots and the centroid (mean P and T). The order in which clusters appear is `STEPS`, near the
-    top of section 2 of `script.js`.
+  - The right panel shows the 149 spots in the three clusters used and draws, for each cluster, a kernel density contour holding 90% of its
+    spots and the centroid (mean P and T). Clusters appear in the order 0, 5, 2, set by `STEPS` near
+    the top of section 2 of `script.js`.
   - To rebuild the data: `python tools/build_data.py <repository folder> .`
 
 ## Publishing on GitHub Pages

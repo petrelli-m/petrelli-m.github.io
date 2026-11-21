@@ -31,7 +31,9 @@ CHANNEL = {'Ca': 'Ca _42Ca_', 'Sc': 'Sc _45Sc_', 'Ti': 'Ti _47Ti_', 'V': 'V _51V
 CA_BACKGROUND = 1e5          # as in the paper's notebooks: Ca below this is not crystal
 MICRONS = 3                  # map pixel size
 BLOCK = 2                    # average 2 × 2 pixels: 6 µm pixels on the page
-MIN_SHARE = 0.05             # clusters covering less of the crystal than this are not used
+USE_CLUSTERS = [0, 2, 5]     # clusters shown in the hero figure; the others are not used
+MIN_FRAGMENT = 6             # crystal fragments smaller than this (pixels) are dropped
+MIN_PATCH = 4                # cluster patches smaller than this (pixels) join their neighbours
 # Line separating the attached small grain (upper left) from the main crystal,
 # in map pixels (x, y): only pixels to the lower right are kept
 CUT = (82, 40, 33, 102)
@@ -151,12 +153,36 @@ filled = ~np.isnan(blocks[..., 0])
 zmap = (np.log10(np.maximum(blocks[filled], floor)) - mean) / sd
 distance = ((zmap[:, None, :] - centroids) ** 2).sum(-1)
 
-# Clusters covering at least MIN_SHARE of the crystal; each pixel then takes the nearest of these
-share = np.bincount(distance.argmin(1), minlength=6) / filled.sum()
-used = [k for k in range(6) if share[k] >= MIN_SHARE]
-print('share of the crystal by cluster:', ', '.join(f'{k}: {s:.1%}' for k, s in enumerate(share)), '-> used', used)
+# Each pixel takes the nearest of the clusters used
+used = USE_CLUSTERS
 labels_map = np.full(filled.shape, -1)
 labels_map[filled] = np.array(used)[distance[:, used].argmin(1)]
+
+# No isolated pixels: drop small crystal fragments, then give small cluster
+# patches the most common cluster around them, until none is left
+EIGHT = np.ones((3, 3), bool)
+parts, n_parts = ndimage.label(filled, structure=EIGHT)
+sizes = np.bincount(parts.ravel())
+filled &= sizes[parts] >= MIN_FRAGMENT
+labels_map[~filled] = -1
+for _ in range(20):
+    changed = 0
+    for k in used:
+        patches, n = ndimage.label(labels_map == k, structure=EIGHT)
+        for p_id, size in enumerate(np.bincount(patches.ravel())[1:], start=1):
+            if size >= MIN_PATCH:
+                continue
+            patch = patches == p_id
+            ring = ndimage.binary_dilation(patch, structure=EIGHT) & ~patch & filled
+            around = labels_map[ring]
+            around = around[around != k]
+            if around.size:
+                labels_map[patch] = np.bincount(around).argmax()
+                changed += 1
+    if not changed:
+        break
+share = {k: (labels_map == k).sum() / filled.sum() for k in used}
+print('share of the crystal by cluster:', ', '.join(f'{k}: {v:.1%}' for k, v in share.items()))
 
 out = {e: [] for e in SHOWN}
 out['cluster'] = []
@@ -192,8 +218,9 @@ body = ',\n'.join(f'  {e}: [\n' + ',\n'.join(f'    "{r}"' for r in out[e]) + '\n
      cluster     nearest published cluster mean on log-transformed,
                  standardised {", ".join(ELEMENTS)}
                  (means and scaling from the 316 spot analyses), among
-                 the clusters that cover at least {MIN_SHARE:.0%} of the
-                 crystal: those listed in "clusters".
+                 the clusters listed in "clusters". Crystal fragments
+                 under {MIN_FRAGMENT} pixels are dropped, and cluster patches
+                 under {MIN_PATCH} pixels take the cluster around them.
    ================================================================= */
 
 const CPX_MAP = {{
