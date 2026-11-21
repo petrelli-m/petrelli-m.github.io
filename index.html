@@ -77,25 +77,13 @@
       </p>
     </div>
 
-    <!-- Hero figure: two views. data-show sets the first one ("map" or "tas");
-         data-alternate="12" switches view 12 s after each animation (remove it to stop). -->
-    <figure class="hero-figure" id="hero-figure" data-show="map" data-alternate="12">
-      <div class="figure-view" data-view="map">
-        <canvas id="crystal-map" width="700" height="525" role="img" aria-label="Left: trace-element map of a clinopyroxene crystal from the 2021 Tajogaite eruption, La Palma, shown for chromium, scandium and zirconium, then coloured by four clusters: an evolved core with a thin edge, a broad chromium-rich zone grown from basanite recharge, and an outer rim. Right: depth against temperature of crystallisation for 196 spot analyses in the same four clusters, from a machine-learning thermobarometer, drawn as a density contour and a centroid for each cluster. The two evolved-core clusters centre at about 23 to 26 kilometres and 1050 to 1080 degrees Celsius; the recharge and outer-rim clusters centre in the crust, at about 4 to 8 kilometres and 1090 to 1100 degrees."></canvas>
-      </div>
-      <div class="figure-view" data-view="tas" hidden>
-        <canvas id="tas" width="700" height="525" role="img" aria-label="Total alkali–silica classification diagram for volcanic rocks, with synthetic sample points from three magmatic series grouped by colour."></canvas>
-      </div>
+    <!-- Hero figure: the crystal map and its pressure–temperature panel,
+         drawn by script.js from the files in data/. -->
+    <figure class="hero-figure" id="hero-figure">
+      <canvas id="crystal-map" width="700" height="525" role="img" aria-label="Left: trace-element map of a clinopyroxene crystal from the 2021 Tajogaite eruption, La Palma, shown for chromium, scandium and zirconium, then coloured by four clusters: an evolved core with a thin edge, a broad chromium-rich zone grown from basanite recharge, and an outer rim. Right: depth against temperature of crystallisation for 196 spot analyses in the same four clusters, from a machine-learning thermobarometer, drawn as a density contour and a centroid for each cluster. The two evolved-core clusters centre at about 23 to 26 kilometres and 1050 to 1080 degrees Celsius; the recharge and outer-rim clusters centre in the crust, at about 4 to 8 kilometres and 1090 to 1100 degrees."></canvas>
       <figcaption>
-        <div class="figure-bar">
-          <p class="figure-readout" id="figure-readout">Point at the figure to read the values.</p>
-          <div class="figure-switch" role="group" aria-label="Figure shown" hidden>
-            <button type="button" data-show="map" aria-pressed="true">Crystal map</button>
-            <button type="button" data-show="tas" aria-pressed="false">TAS diagram</button>
-          </div>
-        </div>
-        <p class="figure-note" data-view="map">Clusters in a Tajogaite 2021 clinopyroxene, La Palma, and their pressure–temperature conditions from machine-learning thermobarometry (<a href="https://doi.org/10.1038/s41467-026-77213-9">Caracciolo et al., 2026, <i>Nature Communications</i></a>).</p>
-        <p class="figure-note" data-view="tas" hidden>Total alkali–silica diagram (Le Bas et al., 1986). The samples are synthetic: three magmatic series, grouped by a clustering step.</p>
+        <p class="figure-readout" id="figure-readout">Point at the figure to read the values.</p>
+        <p class="figure-note">Clusters in a Tajogaite 2021 clinopyroxene, La Palma, and their pressure–temperature conditions from machine-learning thermobarometry (<a href="https://doi.org/10.1038/s41467-026-77213-9">Caracciolo et al., 2026, <i>Nature Communications</i></a>).</p>
       </figcaption>
     </figure>
   </div>
@@ -219,7 +207,7 @@
 
         <article class="topic">
           <h3>The LA-ICP-MS laboratory in Perugia</h3>
-          <p>In 2001, I started developing the LA-ICP-MS laboratory at the Department of Geology, University of Perugia. Since 2002 (with a pause from 2010 to 2014), I have run it: maintaining the instruments, developing analytical protocols, analysing natural and experimental samples, and supporting external users. The laboratory now hosts two LA-ICP-MS systems and is involved in many scientific projects, with the active and invaluable support of Mónica Ágreda López.</p>
+          <p>In 2001, I started developing the LA-ICP-MS laboratory at the Department of Geology, University of Perugia. Since 2002 (with a pause from 2010 to 2014), I have run it: maintaining the instruments, developing analytical protocols, analysing natural and experimental samples, and supporting external users. I now manage the laboratory in collaboration with Mónica Ágreda López, and it is involved in many active scientific projects worldwide.</p>
           <details>
             <summary>Selected publications (3)</summary>
             <ol class="refs">

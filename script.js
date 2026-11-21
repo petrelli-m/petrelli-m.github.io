@@ -3,12 +3,11 @@
 
    No page text lives here: all content is in index.html.
    0. Shared helpers
-   1. Hero figure: switches between the two views below
+   1. Hero figure: starts the crystal map
    2. Crystal map and the clusters in pressure–temperature space
-   3. TAS diagram: total alkali–silica plot with synthetic samples
-   4. Publications: search and filter over the list in index.html
-   5. Navigation: underline the section in view
-   6. Portrait: show a hint if portrait.jpg is missing
+   3. Publications: search and filter over the list in index.html
+   4. Navigation: underline the section in view
+   5. Portrait: show a hint if portrait.jpg is missing
    ================================================================= */
 
 'use strict';
@@ -47,14 +46,6 @@ function seededRandom(seed) {
   };
 }
 
-function gaussian(random) {
-  let u = 0;
-  let v = 0;
-  while (!u) u = random();
-  while (!v) v = random();
-  return Math.sqrt(-2 * Math.log(u)) * Math.cos(2 * Math.PI * v);
-}
-
 // Colours from style.css, as seen by a given element (light or dark band)
 function themeColours(element) {
   const css = getComputedStyle(element);
@@ -63,7 +54,6 @@ function themeColours(element) {
     ink: hexToRgb(token('--ink')),
     muted: hexToRgb(token('--muted')),
     paper: hexToRgb(token('--paper')),
-    groups: ['--d1', '--d2', '--d3'].map(n => hexToRgb(token(n))),
     serif: token('--serif'),
     sans: token('--sans')
   };
@@ -80,59 +70,17 @@ function fitCanvas(canvas) {
 
 
 /* 1. HERO FIGURE ----------------------------------------------------
-   index.html sets which view comes first (data-show="map" or "tas")
-   and, with data-alternate="12", switches view 12 seconds after each
-   animation ends. Remove data-alternate to switch only by hand. */
+   Draws the crystal map once the page has painted, and plays it once. */
 
 (function heroFigure() {
-  const figure = document.getElementById('hero-figure');
-  if (!figure) return;
-
+  const canvas = document.getElementById('crystal-map');
   const readout = document.getElementById('figure-readout');
-  const switchBox = figure.querySelector('.figure-switch');
-  const buttons = Array.from(switchBox.querySelectorAll('button'));
-  const panels = Array.from(figure.querySelectorAll('[data-view]'));
-  const defaultReadout = readout.textContent;
-  const holdMs = Number(figure.dataset.alternate || 0) * 1000;
+  if (!canvas || !readout || typeof CPX_SPOTS === 'undefined' || typeof CPX_MAP === 'undefined') return;
 
-  // Each view is built the first time it is shown, after the page has painted
-  const hasData = typeof CPX_SPOTS !== 'undefined' && typeof CPX_MAP !== 'undefined';
-  const builders = {
-    map: () => createCrystalMap(document.getElementById('crystal-map'), readout, defaultReadout, CPX_SPOTS, CPX_MAP),
-    tas: () => createTasDiagram(document.getElementById('tas'), readout, defaultReadout)
-  };
-  const views = {};
-
-  let current = null;
-  let timer = null;
-  let alternate = holdMs > 0 && !reduceMotion && hasData;
-
-  function show(name) {
-    clearTimeout(timer);
-    if (current && current !== name) views[current].stop();
-    current = name;
-    panels.forEach(panel => { panel.hidden = panel.dataset.view !== name; });
-    buttons.forEach(b => b.setAttribute('aria-pressed', String(b.dataset.show === name)));
-    readout.textContent = defaultReadout;
-    views[name] = views[name] || builders[name]();
-    views[name].start().then(() => {
-      if (alternate && current === name) {
-        timer = setTimeout(() => show(name === 'map' ? 'tas' : 'map'), holdMs);
-      }
-    });
-  }
-
-  buttons.forEach(button => {
-    button.addEventListener('click', () => {
-      alternate = false;
-      show(button.dataset.show);
-    });
-  });
-
-  switchBox.hidden = !hasData;
   const fontsReady = document.fonts ? document.fonts.ready : Promise.resolve();
-  const first = figure.dataset.show === 'tas' || !hasData ? 'tas' : 'map';
-  fontsReady.then(() => requestAnimationFrame(() => setTimeout(() => show(first), 0)));
+  fontsReady.then(() => requestAnimationFrame(() => setTimeout(() => {
+    createCrystalMap(canvas, readout, readout.textContent, CPX_SPOTS, CPX_MAP).start();
+  }, 0)));
 })();
 
 
@@ -372,7 +320,6 @@ function createCrystalMap(canvas, readout, defaultReadout, spotData, mapData) {
   let frameId = 0;
   let t0 = 0;
   let now = Infinity;
-  let resolveDone = null;
 
   function resize() {
     size = fitCanvas(canvas);
@@ -701,31 +648,17 @@ function createCrystalMap(canvas, readout, defaultReadout, spotData, mapData) {
     } else {
       now = Infinity;
       draw(now);
-      if (resolveDone) resolveDone();
     }
   }
 
-  // Plays the animation; resolves when it has finished
+  // Plays the animation once (or shows the end state when motion is reduced)
   function start() {
     cancelAnimationFrame(frameId);
     t0 = 0;
     hover = null;
     now = reduceMotion ? Infinity : 0;
     resize();
-    return new Promise(resolve => {
-      if (reduceMotion) {
-        resolve();
-        return;
-      }
-      resolveDone = resolve;
-      frameId = requestAnimationFrame(frame);
-    });
-  }
-
-  function stop() {
-    cancelAnimationFrame(frameId);
-    resolveDone = null;
-    now = Infinity;
+    if (!reduceMotion) frameId = requestAnimationFrame(frame);
   }
 
   /* --- Readout: the pixel, spot or cluster under the pointer ------ */
@@ -801,327 +734,11 @@ function createCrystalMap(canvas, readout, defaultReadout, spotData, mapData) {
   canvas.addEventListener('pointerleave', clearItem);
   new ResizeObserver(() => { if (!canvas.closest('[hidden]')) resize(); }).observe(canvas);
 
-  return { start, stop };
+  return { start };
 }
 
 
-/* 3. TAS DIAGRAM ----------------------------------------------------
-   Field boundaries after Le Bas et al. (1986). The points are
-   synthetic, drawn along three magmatic-series trends; colours come
-   from style.css (--ink, --muted, --paper, --d1, --d2, --d3). */
-
-function createTasDiagram(canvas, readout, defaultReadout) {
-  const ctx = canvas.getContext('2d');
-  const RANGE = { x0: 37, x1: 79, y0: 0, y1: 14 };
-
-  // Field boundaries [SiO2, Na2O + K2O]
-  const LINES = [
-    [[41, 0], [41, 7]],
-    [[41, 3], [45, 3]],
-    [[45, 0], [45, 5]],
-    [[45, 5], [52, 5], [57, 5.9], [63, 7], [69, 8]],
-    [[52, 0], [52, 5]], [[57, 0], [57, 5.9]], [[63, 0], [63, 7]],
-    [[69, 8], [77, 0]], [[69, 8], [69, 14]],
-    [[45, 5], [49.4, 7.3], [53, 9.3], [57.6, 11.7], [61, 13.5], [61.95, 14]],
-    [[41, 7], [45, 9.4], [48.4, 11.5], [52.5, 14]],
-    [[52, 5], [49.4, 7.3]], [[57, 5.9], [53, 9.3]], [[63, 7], [57.6, 11.7]],
-    [[49.4, 7.3], [45, 9.4]], [[53, 9.3], [48.4, 11.5]], [[57.6, 11.7], [52.5, 14]]
-  ];
-
-  // Fields: name, label position, optional label with line breaks, outline
-  const FIELDS = [
-    { name: 'Picrobasalt', at: [43, 1.5], label: 'Picro-\nbasalt', poly: [[41, 0], [41, 3], [45, 3], [45, 0]] },
-    { name: 'Basalt', at: [48.5, 2.5], poly: [[45, 0], [45, 5], [52, 5], [52, 0]] },
-    { name: 'Basaltic andesite', at: [54.5, 2.7], label: 'Basaltic\nandesite', poly: [[52, 0], [52, 5], [57, 5.9], [57, 0]] },
-    { name: 'Andesite', at: [60, 3.2], poly: [[57, 0], [57, 5.9], [63, 7], [63, 0]] },
-    { name: 'Dacite', at: [67, 3.6], poly: [[63, 0], [63, 7], [69, 8], [77, 0]] },
-    { name: 'Rhyolite', at: [74.5, 9], poly: [[77, 0], [69, 8], [69, 14], [79, 14], [79, 0]] },
-    { name: 'Trachybasalt', at: [48.8, 5.75], label: 'Trachy-\nbasalt', poly: [[45, 5], [49.4, 7.3], [52, 5]] },
-    { name: 'Basaltic trachyandesite', at: [53.1, 6.9], label: 'Basaltic\ntrachy-\nandesite', poly: [[52, 5], [49.4, 7.3], [53, 9.3], [57, 5.9]] },
-    { name: 'Trachyandesite', at: [57.7, 8.6], label: 'Trachy-\nandesite', poly: [[57, 5.9], [53, 9.3], [57.6, 11.7], [63, 7]] },
-    { name: 'Trachyte or trachydacite', at: [64.6, 10.8], label: 'Trachyte\ntrachydacite', poly: [[63, 7], [57.6, 11.7], [61, 13.5], [61.95, 14], [69, 14], [69, 8]] },
-    { name: 'Tephrite or basanite', at: [43.4, 5.6], label: 'Tephrite\nbasanite', poly: [[41, 3], [41, 7], [45, 9.4], [49.4, 7.3], [45, 5], [45, 3]] },
-    { name: 'Phonotephrite', at: [48.9, 9.35], label: 'Phono-\ntephrite', poly: [[49.4, 7.3], [45, 9.4], [48.4, 11.5], [53, 9.3]] },
-    { name: 'Tephriphonolite', at: [53, 11.55], label: 'Tephri-\nphonolite', poly: [[53, 9.3], [48.4, 11.5], [52.5, 14], [57.6, 11.7]] },
-    { name: 'Phonolite', at: [57.4, 13.25], poly: [[57.6, 11.7], [52.5, 14], [61.95, 14], [61, 13.5]] },
-    { name: 'Foidite', at: [43.8, 11.6], poly: [[41, 7], [41, 14], [52.5, 14], [48.4, 11.5], [45, 9.4]] }
-  ];
-
-  // Three trends: subalkaline (basalt to rhyolite), potassic
-  // (tephrite to phonolite), shoshonitic (trachybasalt to trachyte)
-  const SERIES = [
-    { n: 92, si: [47.5, 75.5], alk: s => 2.0 + (s - 47) * 0.17, sd: 0.42 },
-    { n: 70, si: [46, 59], alk: s => 6.6 + (s - 46) * 0.5, sd: 0.36 },
-    { n: 70, si: [49, 65], alk: s => 5.6 + (s - 49) * 0.4, sd: 0.38 }
-  ];
-
-  const random = seededRandom(20061);
-  const points = [];
-  SERIES.forEach((s, group) => {
-    for (let i = 0; i < s.n; i++) {
-      const si = s.si[0] + (s.si[1] - s.si[0]) * random() + gaussian(random) * 0.3;
-      const alk = Math.min(13.7, Math.max(0.5, s.alk(si) + gaussian(random) * s.sd));
-      points.push({
-        x: si, y: alk, group,
-        drift: (random() - 0.5) * 3,
-        lift: 2 + random() * 5,
-        delay: 150 + random() * 1450
-      });
-    }
-  });
-
-  const centroids = SERIES.map((s, group) => {
-    const own = points.filter(p => p.group === group);
-    return {
-      x: own.reduce((sum, p) => sum + p.x, 0) / own.length,
-      y: own.reduce((sum, p) => sum + p.y, 0) / own.length
-    };
-  });
-
-  // Points nearer their centroid take their group colour first
-  points.forEach(p => {
-    const c = centroids[p.group];
-    const d = Math.hypot((p.x - c.x) / 10, (p.y - c.y) / 4);
-    p.colourDelay = 2150 + Math.min(d, 1.4) * 650 + random() * 120;
-  });
-
-  const END = 3700;
-
-  let size = { width: 0, height: 0, ratio: 1 };
-  let plot = null;
-  let colours = null;
-  let hover = null;
-  let frameId = 0;
-  let t0 = 0;
-  let now = Infinity;
-  let resolveDone = null;
-
-  const X = v => plot.l + (v - RANGE.x0) / (RANGE.x1 - RANGE.x0) * (plot.r - plot.l);
-  const Y = v => plot.b - (v - RANGE.y0) / (RANGE.y1 - RANGE.y0) * (plot.b - plot.t);
-  const fromX = px => RANGE.x0 + (px - plot.l) / (plot.r - plot.l) * (RANGE.x1 - RANGE.x0);
-  const fromY = py => RANGE.y0 + (plot.b - py) / (plot.b - plot.t) * (RANGE.y1 - RANGE.y0);
-
-  function resize() {
-    size = fitCanvas(canvas);
-    colours = themeColours(canvas);
-    const narrow = size.width < 480;
-    plot = { l: narrow ? 34 : 46, t: 10, r: size.width - 8, b: size.height - (narrow ? 34 : 40) };
-    draw(now);
-  }
-
-  function inside(poly, x, y) {
-    let hit = false;
-    for (let i = 0, j = poly.length - 1; i < poly.length; j = i++) {
-      const [xi, yi] = poly[i];
-      const [xj, yj] = poly[j];
-      if ((yi > y) !== (yj > y) && x < (xj - xi) * (y - yi) / (yj - yi) + xi) hit = !hit;
-    }
-    return hit;
-  }
-
-  function draw(t) {
-    const { width, height, ratio } = size;
-    if (!plot || width < 20) return;
-    const { ink, muted, paper, groups } = colours;
-    const narrow = width < 480;
-    const tick = narrow ? 10 : 11;
-    ctx.setTransform(ratio, 0, 0, ratio, 0, 0);
-    ctx.clearRect(0, 0, width, height);
-
-    // Graph-paper grid
-    ctx.lineWidth = 1;
-    for (let v = 38; v <= 79; v++) {
-      ctx.strokeStyle = rgba(ink, v % 5 === 0 ? 0.11 : 0.05);
-      ctx.beginPath();
-      ctx.moveTo(Math.round(X(v)) + 0.5, plot.t);
-      ctx.lineTo(Math.round(X(v)) + 0.5, plot.b);
-      ctx.stroke();
-    }
-    for (let v = 1; v <= 14; v++) {
-      ctx.strokeStyle = rgba(ink, v % 2 === 0 ? 0.11 : 0.05);
-      ctx.beginPath();
-      ctx.moveTo(plot.l, Math.round(Y(v)) + 0.5);
-      ctx.lineTo(plot.r, Math.round(Y(v)) + 0.5);
-      ctx.stroke();
-    }
-
-    // Axes, tick labels and axis titles
-    ctx.strokeStyle = rgba(ink, 0.55);
-    ctx.beginPath();
-    ctx.moveTo(plot.l + 0.5, plot.t);
-    ctx.lineTo(plot.l + 0.5, plot.b + 0.5);
-    ctx.lineTo(plot.r, plot.b + 0.5);
-    ctx.stroke();
-
-    ctx.fillStyle = rgba(muted, 1);
-    ctx.font = `400 ${tick}px ${colours.sans}`;
-    ctx.textAlign = 'center';
-    ctx.textBaseline = 'top';
-    for (let v = 40; v <= 75; v += 5) ctx.fillText(String(v), X(v), plot.b + 6);
-    ctx.textAlign = 'right';
-    ctx.textBaseline = 'middle';
-    for (let v = 0; v <= 14; v += 2) ctx.fillText(String(v), plot.l - 7, Y(v));
-
-    ctx.font = `500 ${tick}px ${colours.sans}`;
-    ctx.textBaseline = 'bottom';
-    ctx.fillText('SiO₂ (wt%)', plot.r, plot.b + (narrow ? 32 : 38));
-    ctx.save();
-    ctx.translate(narrow ? 10 : 12, plot.t);
-    ctx.rotate(-Math.PI / 2);
-    ctx.textBaseline = 'middle';
-    ctx.fillText('Na₂O + K₂O (wt%)', 0, 0);
-    ctx.restore();
-
-    // Field boundaries
-    ctx.strokeStyle = rgba(ink, 0.6);
-    ctx.lineWidth = 1.1;
-    ctx.lineJoin = 'round';
-    LINES.forEach(line => {
-      ctx.beginPath();
-      line.forEach(([x, y], i) => (i ? ctx.lineTo(X(x), Y(y)) : ctx.moveTo(X(x), Y(y))));
-      ctx.stroke();
-    });
-
-    // Group centroids
-    const centroidAlpha = clamp01((t - 1950) / 500);
-    if (centroidAlpha > 0) {
-      centroids.forEach((c, group) => {
-        const arm = narrow ? 5 : 7;
-        const cx = X(c.x);
-        const cy = Y(c.y);
-        ctx.strokeStyle = rgba(groups[group], centroidAlpha);
-        ctx.lineWidth = 1.6;
-        ctx.beginPath();
-        ctx.moveTo(cx - arm, cy);
-        ctx.lineTo(cx + arm, cy);
-        ctx.moveTo(cx, cy - arm);
-        ctx.lineTo(cx, cy + arm);
-        ctx.stroke();
-      });
-    }
-
-    // Samples settle onto the plot, then take their group colour
-    const radius = narrow ? 2.3 : 3;
-    points.forEach(p => {
-      const e = easeOut(clamp01((t - p.delay) / 750));
-      if (e <= 0) return;
-      const x = p.x + p.drift * (1 - e);
-      const y = p.y + p.lift * (1 - e);
-      const c = clamp01((t - p.colourDelay) / 420);
-      ctx.fillStyle = rgba(mixRgb(muted, groups[p.group], c), 0.85 * e);
-      ctx.beginPath();
-      ctx.arc(X(x), Y(y), radius, 0, Math.PI * 2);
-      ctx.fill();
-    });
-
-    // Field names, where there is room
-    if (width >= 520) {
-      const fs = width < 680 ? 10.5 : 12;
-      ctx.font = `italic 400 ${fs}px ${colours.serif}`;
-      ctx.fillStyle = rgba(muted, 0.95);
-      ctx.strokeStyle = rgba(paper, 0.85);
-      ctx.lineWidth = 3;
-      ctx.textAlign = 'center';
-      ctx.textBaseline = 'middle';
-      FIELDS.forEach(f => {
-        const rows = (f.label || f.name).split('\n');
-        rows.forEach((row, i) => {
-          const ly = Y(f.at[1]) + (i - (rows.length - 1) / 2) * fs * 1.08;
-          ctx.strokeText(row, X(f.at[0]), ly);
-          ctx.fillText(row, X(f.at[0]), ly);
-        });
-      });
-    }
-
-    // Crosshair under the pointer
-    if (hover) {
-      const hx = X(hover.x);
-      const hy = Y(hover.y);
-      ctx.strokeStyle = rgba(ink, 0.5);
-      ctx.lineWidth = 1;
-      ctx.setLineDash([3, 3]);
-      ctx.beginPath();
-      ctx.moveTo(hx, plot.b);
-      ctx.lineTo(hx, hy);
-      ctx.lineTo(plot.l, hy);
-      ctx.stroke();
-      ctx.setLineDash([]);
-      ctx.fillStyle = rgba(ink, 1);
-      ctx.beginPath();
-      ctx.arc(hx, hy, 3.5, 0, Math.PI * 2);
-      ctx.fill();
-    }
-  }
-
-  function frame(time) {
-    if (!t0) t0 = time;
-    now = time - t0;
-    draw(now);
-    if (now < END) {
-      frameId = requestAnimationFrame(frame);
-    } else {
-      now = Infinity;
-      draw(now);
-      if (resolveDone) resolveDone();
-    }
-  }
-
-  // Plays the animation; resolves when it has finished
-  function start() {
-    cancelAnimationFrame(frameId);
-    t0 = 0;
-    now = reduceMotion ? Infinity : 0;
-    resize();
-    return new Promise(resolve => {
-      if (reduceMotion) {
-        resolve();
-        return;
-      }
-      resolveDone = resolve;
-      frameId = requestAnimationFrame(frame);
-    });
-  }
-
-  function stop() {
-    cancelAnimationFrame(frameId);
-    resolveDone = null;
-    now = Infinity;
-  }
-
-  function showComposition(event) {
-    const box = canvas.getBoundingClientRect();
-    const px = event.clientX - box.left;
-    const py = event.clientY - box.top;
-    if (px < plot.l || px > plot.r || py < plot.t || py > plot.b) {
-      clearComposition();
-      return;
-    }
-    const x = fromX(px);
-    const y = fromY(py);
-    const field = FIELDS.find(f => inside(f.poly, x, y));
-    hover = { x, y };
-    readout.textContent = `SiO₂ ${x.toFixed(1)} wt%, Na₂O + K₂O ${y.toFixed(1)} wt%: ` +
-      (field ? field.name.toLowerCase() : 'outside the classification fields');
-    if (now === Infinity) draw(now);
-  }
-
-  function clearComposition() {
-    if (!hover) return;
-    hover = null;
-    readout.textContent = defaultReadout;
-    if (now === Infinity) draw(now);
-  }
-
-  canvas.addEventListener('pointermove', showComposition);
-  canvas.addEventListener('pointerdown', showComposition);
-  canvas.addEventListener('pointerleave', clearComposition);
-  new ResizeObserver(() => { if (!canvas.closest('[hidden]')) resize(); }).observe(canvas);
-
-  return { start, stop };
-}
-
-
-/* 4. PUBLICATIONS ---------------------------------------------------
+/* 3. PUBLICATIONS ---------------------------------------------------
    Works on the <li data-type="..."> items in index.html. To add a
    paper, copy an <li> there; nothing needs changing here. */
 
@@ -1186,7 +803,7 @@ function createTasDiagram(canvas, readout, defaultReadout) {
 })();
 
 
-/* 5. NAVIGATION ---------------------------------------------------- */
+/* 4. NAVIGATION ---------------------------------------------------- */
 
 (function navigationState() {
   const links = Array.from(document.querySelectorAll('.nav-links a'));
@@ -1205,7 +822,7 @@ function createTasDiagram(canvas, readout, defaultReadout) {
 })();
 
 
-/* 6. PORTRAIT ------------------------------------------------------ */
+/* 5. PORTRAIT ------------------------------------------------------ */
 
 (function portraitFallback() {
   const img = document.querySelector('.portrait img');

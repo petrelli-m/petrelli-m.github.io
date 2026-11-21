@@ -6,7 +6,7 @@ Plain HTML, CSS and JavaScript. No framework, no build step.
 |---------------|------------------------------------------------------------------|
 | `index.html`  | All the text: every section, every publication                   |
 | `style.css`   | Layout and colours (basalt and pumice)                           |
-| `script.js`   | Hero figures (crystal map, TAS), publication search, nav         |
+| `script.js`   | Hero figure (crystal map), publication search, navigation        |
 | `data/cpx-spots.js` | La Palma clinopyroxene spots: trace elements, clusters, ML pressure and temperature |
 | `data/cpx-map.js`   | Cr, Sc, Zr and cluster map of a Tajogaite 2021 crystal           |
 | `tools/build_data.py` | Rebuilds the two data files from the paper's repository        |
@@ -23,8 +23,8 @@ Plain HTML, CSS and JavaScript. No framework, no build step.
 - **Dark bands:** add `dark` to a section's class, e.g. `<section class="section dark" id="books">`.
   Remove it to make the section light again. Funding and Contact are dark by default.
 - **Colours:** all in section 1 of `style.css` (light pumice values, then basalt values).
-- **Hero figure:** on `<figure id="hero-figure">`, `data-show="map"` or `"tas"` picks the first view;
-  `data-alternate="12"` switches view 12 s after each animation. Delete it to switch only with the buttons.
+- **Hero figure:** the crystal map plays once when the page opens (not at all for visitors who ask
+  their system to reduce motion).
   The figure uses the data of Caracciolo et al. (2026), Nature Communications,
   doi:10.1038/s41467-026-77213-9, from their repository
   (https://github.com/AlbCaracc/Caracciolo_et_al_2026_CumbreVieja):

@@ -13,8 +13,8 @@
    Basalt and pumice. Pages are light (pumice); any element with
    class="dark" switches to basalt: the navigation, the hero, the
    footer, and whichever <section> you mark in index.html.
-   The hero diagram reads --ink, --muted, --paper and --d1 to --d3
-   from wherever it sits, so it works on light or dark.
+   The hero figure reads --ink, --muted and --paper from wherever it
+   sits, so it works on light or dark.
    ------------------------------------------------------------------ */
 
 :root {
@@ -30,9 +30,6 @@
   --muted: #575E67;
   --rule: #D8D8D2;
   --link: #2B5A88;
-  --d1: #B5561A;
-  --d2: #9C7409;
-  --d3: #2B5A88;
 
   /* Basalt: used inside class="dark" */
   --basalt: #1C2026;
@@ -50,9 +47,6 @@
   --muted: var(--basalt-muted);
   --rule: var(--basalt-rule);
   --link: var(--basalt-link);
-  --d1: #F0883A;
-  --d2: #F3C75C;
-  --d3: #82B8E8;
   background: var(--paper);
   color: var(--ink);
 }
@@ -317,45 +311,11 @@ a:hover {
   line-height: 1.5;
 }
 
-.figure-bar {
-  display: flex;
-  flex-wrap: wrap;
-  align-items: center;
-  justify-content: space-between;
-  gap: 0.5rem 1rem;
-}
-
 .figure-readout {
   min-height: 1.5em;
   color: var(--ink);
   font-weight: 500;
   font-variant-numeric: lining-nums;
-}
-
-.figure-switch {
-  display: flex;
-  gap: 0.3rem;
-}
-
-.figure-switch button {
-  padding: 0.3rem 0.65rem;
-  border: 1px solid var(--rule);
-  border-radius: 3px;
-  background: transparent;
-  color: var(--muted);
-  font-family: var(--sans);
-  font-size: 0.8125rem;
-  cursor: pointer;
-}
-
-.figure-switch button:hover {
-  border-color: var(--muted);
-  color: var(--ink);
-}
-
-.figure-switch button[aria-pressed="true"] {
-  border-color: var(--ink);
-  color: var(--ink);
 }
 
 .figure-note {
