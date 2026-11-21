@@ -1,0 +1,1226 @@
+<!DOCTYPE html>
+<!--
+  Maurizio Petrelli: personal website
+  Files: index.html (all content), style.css (layout and colours), script.js (diagram and search)
+  Dark bands: add class "dark" to any <section class="section"> (REALISE, Funding and Contact have it).
+-->
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Maurizio Petrelli, Professor of Petrology and Volcanology</title>
+  <meta name="description" content="Maurizio Petrelli, Professor of Petrology and Volcanology at the University of Perugia. Research on magma dynamics, volcanic hazard, critical raw materials and machine learning in petrology.">
+  <meta name="author" content="Maurizio Petrelli">
+  <meta property="og:title" content="Maurizio Petrelli">
+  <meta property="og:description" content="Professor of Petrology and Volcanology, University of Perugia, Italy">
+  <meta property="og:type" content="website">
+  <meta property="og:image" content="https://www.mauriziopetrelli.info/lecture.jpg">
+  <link rel="icon" href="favicon.svg" type="image/svg+xml">
+
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Schibsted+Grotesk:wght@400;500;600&amp;family=Spectral:ital,wght@0,300;0,400;0,500;1,300;1,400&amp;display=swap">
+  <link rel="stylesheet" href="style.css">
+  <script src="data/cpx-spots.js" defer></script>
+  <script src="data/cpx-map.js" defer></script>
+  <script src="script.js" defer></script>
+
+  <script type="application/ld+json">
+  {
+    "@context": "https://schema.org",
+    "@type": "Person",
+    "name": "Maurizio Petrelli",
+    "image": "https://www.mauriziopetrelli.info/portrait.jpg",
+    "jobTitle": "Professor of Petrology and Volcanology",
+    "affiliation": { "@type": "CollegeOrUniversity", "name": "University of Perugia" },
+    "email": "mailto:maurizio.petrelli@unipg.it",
+    "telephone": "+39 075 585 2607",
+    "sameAs": [
+      "https://github.com/petrelli-m",
+      "https://www.scopus.com/authid/detail.uri?authorId=56962729500"
+    ]
+  }
+  </script>
+</head>
+<body>
+
+<a class="skip-link" href="#main">Skip to content</a>
+
+<!-- NAVIGATION ===================================================== -->
+<nav class="site-nav dark" aria-label="Main">
+  <div class="wrap">
+    <a class="brand" href="#top">Maurizio Petrelli</a>
+    <ul class="nav-links">
+      <li><a href="#about">About</a></li>
+      <li><a href="#realise">REALISE</a></li>
+      <li><a href="#research">Research</a></li>
+      <li><a href="#funding">Funding</a></li>
+      <li><a href="#books">Books</a></li>
+      <li><a href="#teaching">Teaching</a></li>
+      <li><a href="#service">Service</a></li>
+      <li><a href="#publications">Publications</a></li>
+      <li><a href="#contact">Contact</a></li>
+    </ul>
+  </div>
+</nav>
+
+<!-- HERO =========================================================== -->
+<header class="hero-band dark" id="top">
+  <div class="wrap hero">
+    <div>
+      <h1><span>Maurizio</span> <span>Petrelli</span></h1>
+      <p class="hero-role">Professor of Petrology and Volcanology<br>University of Perugia, Italy</p>
+      <p class="hero-lead">My research advances quantitative igneous petrology and volcanology through the analysis of natural samples, numerical modelling, experiments and machine learning, with applications to magma dynamics, volcanic hazard, risk mitigation and critical raw materials.</p>
+      <p class="actions">
+        <a class="btn btn-solid" href="mailto:maurizio.petrelli@unipg.it">Email me</a>
+        <a class="btn btn-line" href="https://drive.google.com/file/d/1OS3iTMRsJzJ3qXv5L_IJeB5BliThfrfC/view?usp=drive_link">Download CV</a>
+      </p>
+    </div>
+
+    <!-- Hero figure: two views. data-show sets the first one ("map" or "tas");
+         data-alternate="12" switches view 12 s after each animation (remove it to stop). -->
+    <figure class="hero-figure" id="hero-figure" data-show="map" data-alternate="12">
+      <div class="figure-view" data-view="map">
+        <canvas id="crystal-map" width="700" height="525" role="img" aria-label="Left: trace-element map of a clinopyroxene crystal from the 2021 Tajogaite eruption, La Palma, shown for chromium, scandium and zirconium, then coloured by four clusters: an evolved core with a thin edge, a broad chromium-rich zone grown from basanite recharge, and an outer rim. Right: depth against temperature of crystallisation for 196 spot analyses in the same four clusters, from a machine-learning thermobarometer, drawn as a density contour and a centroid for each cluster. The two evolved-core clusters centre at about 23 to 26 kilometres and 1050 to 1080 degrees Celsius; the recharge and outer-rim clusters centre in the crust, at about 4 to 8 kilometres and 1090 to 1100 degrees."></canvas>
+      </div>
+      <div class="figure-view" data-view="tas" hidden>
+        <canvas id="tas" width="700" height="525" role="img" aria-label="Total alkali–silica classification diagram for volcanic rocks, with synthetic sample points from three magmatic series grouped by colour."></canvas>
+      </div>
+      <figcaption>
+        <div class="figure-bar">
+          <p class="figure-readout" id="figure-readout">Point at the figure to read the values.</p>
+          <div class="figure-switch" role="group" aria-label="Figure shown" hidden>
+            <button type="button" data-show="map" aria-pressed="true">Crystal map</button>
+            <button type="button" data-show="tas" aria-pressed="false">TAS diagram</button>
+          </div>
+        </div>
+        <p class="figure-note" data-view="map">Clinopyroxene from La Palma (<a href="https://doi.org/10.1038/s41467-026-77213-9">Caracciolo et al., 2026, <i>Nature Communications</i></a>). Left: Cr, Sc and Zr maps of the paper’s crystal from the 2021 Tajogaite eruption; only the four clusters covering more than 5% of the crystal are used (0, 1, 2 and 5), and each pixel takes the nearest of their published means on eight trace elements. Right: pressure and temperature of the 196 spot analyses in these clusters, from the three eruptions, from the machine-learning clinopyroxene-only thermobarometer of <a href="https://doi.org/10.1016/j.cageo.2024.105707">Ágreda-López et al. (2024)</a>. For each cluster, a kernel density contour holds 90% of its spots; crosses mark the centroids. Clusters appear from core to rim.</p>
+        <p class="figure-note" data-view="tas" hidden>Total alkali–silica diagram (Le Bas et al., 1986). The samples are synthetic: three magmatic series, grouped by a clustering step.</p>
+      </figcaption>
+    </figure>
+  </div>
+</header>
+
+<main id="main">
+
+  <!-- NOW ========================================================== -->
+  <section class="section" id="now" aria-labelledby="now-title">
+    <div class="wrap section-grid">
+      <h2 id="now-title">Now</h2>
+      <div class="now-grid">
+        <article>
+          <h3>Distinguished Lecturer, 2027</h3>
+          <p>The Italian Geological Society (SGI) and the Italian Society of Mineralogy and Petrology (SIMP) have invited me as Distinguished Lecturer for the XII cycle (2027) of their itinerant conferences, <i lang="it">Leggere la Terra nell’era dell’Intelligenza Artificiale</i>, jointly with Chris Marone (Sapienza Università di Roma). Interested departments can apply to host the two lectures.</p>
+          <p class="links"><a href="https://drive.google.com/file/d/1dPTH1uF07bs74_Dai9Yr-y6BYi3-kDDK/view?usp=share_link">Download the flyer and apply</a></p>
+        </article>
+        <article>
+          <h3>REALISE Doctoral Network</h3>
+          <p>Fifteen doctoral candidates in eight European institutions explore artificial intelligence in igneous petrology, from 2026 to 2030.</p>
+          <p class="links">
+            <a href="#realise">About the project</a>
+            <a href="https://realise-dn.eu/">realise-dn.eu</a>
+          </p>
+        </article>
+        <article>
+          <h3>REALI3SE has started</h3>
+          <p>Since 1 November 2026, staff exchanges link the REALISE network with new partners in Colombia, Argentina, the Democratic Republic of the Congo and South Africa.</p>
+          <p class="links">
+            <a href="#realise">About the project</a>
+            <a href="https://reali3se.eu/">reali3se.eu</a>
+          </p>
+        </article>
+      </div>
+    </div>
+  </section>
+
+  <!-- PHOTO ========================================================
+       A full-width photograph between sections. To change it, replace
+       lecture.jpg and update width, height, alt and the caption.
+  -->
+  <figure class="photo-band dark">
+    <img src="lecture.jpg" alt="Maurizio Petrelli on stage beside a large screen reading “Machine Learning in Petrology and Volcanology”, Department of Physics and Geology, University of Perugia" width="1280" height="813" loading="lazy">
+    <figcaption class="wrap">Lecturing on machine learning in petrology and volcanology.</figcaption>
+  </figure>
+
+  <!-- ABOUT ======================================================== -->
+  <section class="section" id="about" aria-labelledby="about-title">
+    <div class="wrap section-grid">
+      <h2 id="about-title">About</h2>
+      <div class="about">
+        <figure class="portrait">
+          <img src="portrait.jpg" alt="Maurizio Petrelli" width="575" height="719">
+        </figure>
+        <div class="about-text">
+          <p>I am a petrologist and volcanologist working on igneous systems, quantitative petrology, volcanic hazard assessment, and the application of machine-learning methods to Earth science. I obtained my PhD in 2006.</p>
+          <p>After several years in academia, which I greatly enjoyed, family circumstances led me to step away from academic work in 2009 to care for my three young daughters, then aged 1, 1, and 3. During this period, I gained professional experience in e-marketing, web development, and e-commerce, where I was exposed to the early broad adoption of machine learning in these fields. When I returned to academia in 2014, this experience helped me shape a research line focused on applying machine learning to high-dimensional petrological and geochemical datasets.</p>
+          <p>Since 2002 (with a pause from 2009 to 2014), I have also developed and managed a LA-ICP-MS laboratory that supports research in tephrochronology, magma dynamics, and crustal evolution. I devote significant effort to teaching and training through university courses, international short courses, and two books on Python and machine learning for Earth scientists.</p>
+          <p>Over the past decade, I have published more than 100 articles in leading international scientific journals, as well as two books, and over the last five years, I have secured approximately €6 million in competitive research funding from European and local sources. I conceived and proudly coordinate the MSCA REALISE Doctoral Network and REALI3SE Staff Exchange projects, two major collaborative initiatives in igneous petrology. They are designed to connect igneous petrologists and volcanologists with data scientists and leading machine learning experts worldwide, to address timely and challenging problems in hazard assessment, risk mitigation, and the emplacement of fertile critical raw material deposits.</p>
+          <p>I have been invited to speak at international conferences and leading academic institutions on machine learning in petrology and volcanology. In my spare time, I enjoy spending time with my family, looking after my dog, and reading about the philosophy of science.</p>
+
+          <dl class="facts">
+            <div>
+              <dt>Position</dt>
+              <dd>Professor of Petrology and Volcanology, Department of Physics and Geology, University of Perugia</dd>
+            </div>
+            <div>
+              <dt>Laboratory</dt>
+              <dd>LA-ICP-MS laboratory, University of Perugia (two LA-ICP-MS systems)</dd>
+            </div>
+            <div>
+              <dt>Editorial</dt>
+              <dd>Associate Editor, <i>American Mineralogist</i> and <i>Artificial Intelligence in Geosciences</i></dd>
+            </div>
+          </dl>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- REALISE AND REALI3SE ===========================================
+       The two Marie Skłodowska-Curie Actions. Facts follow
+       realise-dn.eu, reali3se.eu and CORDIS.
+  -->
+  <section class="section dark" id="realise" aria-labelledby="realise-title">
+    <div class="wrap section-grid">
+      <h2 id="realise-title">REALISE and REALI3SE</h2>
+      <div class="content-wide">
+        <p class="intro">Two Marie Skłodowska-Curie Actions that I conceived and coordinate. They connect igneous petrologists, volcanologists and ore geologists with data scientists and machine-learning experts, to address volcanic hazard, risk mitigation and the formation of critical raw material deposits.</p>
+
+        <div class="projects">
+          <article class="project">
+            <h3>REALISE <span class="subtitle">MSCA Doctoral Network</span></h3>
+            <p>Bridging igneous petrology and machine learning for science and society. REALISE explores the opportunities, challenges and risks of artificial intelligence in igneous petrology, and trains Earth scientists and entrepreneurs to use machine learning to acquire, model and interpret petrological data. Its research targets high-risk volcanic regions and critical raw materials such as lithium, platinum-group metals and rare earth elements.</p>
+            <dl class="facts">
+              <div>
+                <dt>Period</dt>
+                <dd>February 2026 – January 2030</dd>
+              </div>
+              <div>
+                <dt>Doctoral candidates</dt>
+                <dd>15, hosted by eight universities and research institutes in six countries</dd>
+              </div>
+              <div>
+                <dt>EU contribution</dt>
+                <dd>€4,356,827.64</dd>
+              </div>
+              <div>
+                <dt>Grant</dt>
+                <dd>101226206, <a href="https://doi.org/10.3030/101226206">doi:10.3030/101226206</a></dd>
+              </div>
+            </dl>
+            <p class="links">
+              <a href="https://realise-dn.eu/">realise-dn.eu</a>
+              <a href="https://cordis.europa.eu/project/id/101226206">CORDIS</a>
+              <a href="https://www.linkedin.com/company/realise-msca-doctoral-network">LinkedIn</a>
+            </p>
+          </article>
+
+          <article class="project">
+            <h3>REALI3SE <span class="subtitle">MSCA Staff Exchanges</span></h3>
+            <p>Bridging igneous petrology and machine learning through intersectoral, interdisciplinary and intercontinental staff exchanges. REALI3SE builds on REALISE and opens it to new partners in Colombia, Argentina, the Democratic Republic of the Congo and South Africa, with exchanges across igneous petrology, volcanology, ore geology, geochemistry, physics and data science.</p>
+            <dl class="facts">
+              <div>
+                <dt>Period</dt>
+                <dd>November 2026 – October 2030</dd>
+              </div>
+              <div>
+                <dt>Consortium</dt>
+                <dd>Academic and non-academic partners in Europe, South America and Africa</dd>
+              </div>
+              <div>
+                <dt>EU contribution</dt>
+                <dd>€1,172,340</dd>
+              </div>
+              <div>
+                <dt>Grant</dt>
+                <dd>101299493, <a href="https://doi.org/10.3030/101299493">doi:10.3030/101299493</a></dd>
+              </div>
+            </dl>
+            <p class="links">
+              <a href="https://reali3se.eu/">reali3se.eu</a>
+              <a href="https://cordis.europa.eu/project/id/101299493">CORDIS</a>
+            </p>
+          </article>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- RESEARCH ===================================================== -->
+  <section class="section" id="research" aria-labelledby="research-title">
+    <div class="wrap section-grid">
+      <h2 id="research-title">Research</h2>
+      <div class="content">
+
+        <article class="topic">
+          <h3>Machine learning in petrology, geochemistry and volcanology</h3>
+          <p>I aim to systematically investigate the use of machine learning (ML) techniques for the solution of problems that are relevant to geological applications, with emphasis on igneous petrology, geochemistry, and volcanology. This line of research was sparked in 2014 thanks to the grants “Challenge: Coupling macHine leArning, Leading anaLytical mEthods aNd larGe gEochemical datasets in tephra studies” (PI, 2015–2017) and “ENGAGE: machinE learNinG Applications for Geological problEms” (PI, 2019–2020), funded by the University of Perugia, and the Microsoft Machine Learning Award (PI, 2015). It is now supported by many active grants that I lead or act as co-PI.</p>
+          <p>The work has developed through a series of connected studies. It began with classification methods applied to geochemical data for tectonic setting recognition, was later extended to volcanology and tephrochronology, and then progressed to regression approaches for estimating magmatic pressure and temperature as a complement to established thermodynamic methods. These developments were synthesised in a broader review of the field, and I am currently contributing a book chapter on methodological advances and the growing role of artificial intelligence in volcanology.</p>
+          <details>
+            <summary>Selected publications (8)</summary>
+            <ol class="refs">
+              <li>Petrelli M., Anantrasirichai N., Bean C.J., Biggs J., Malfante M., Wilding J.D., Zhu W. (2025). Methodological advances in volcanology: the role of artificial intelligence in volcano monitoring, modelling, and hazard assessment. <i>The Encyclopedia of Volcanoes</i>, 3rd edition, Elsevier. Accepted for publication.</li>
+              <li>Petrelli M. (2024). Machine learning in petrology: state-of-the-art and future perspectives. <i>Journal of Petrology</i>. <a href="https://doi.org/10.1093/petrology/egae036">10.1093/petrology/egae036</a></li>
+              <li>Petrelli M. (2023). <i>Machine Learning for Earth Sciences</i>. Springer. <a href="https://doi.org/10.1007/978-3-031-35114-3">10.1007/978-3-031-35114-3</a></li>
+              <li>Jorgenson C., Higgins O., Petrelli M., Bégué F., Caricchi L. (2022). A machine learning-based approach to clinopyroxene thermobarometry: model optimization and distribution for use in Earth sciences. <i>JGR: Solid Earth</i>. <a href="https://doi.org/10.1029/2021JB022904">10.1029/2021JB022904</a></li>
+              <li>Petrelli M., Caricchi L., Perugini D. (2020). Machine learning thermo-barometry: application to clinopyroxene-bearing magmas. <i>JGR: Solid Earth</i>. <a href="https://doi.org/10.1029/2020JB020130">10.1029/2020JB020130</a></li>
+              <li>Caricchi L., Petrelli M., Bali E., Sheldrake T., Pioli L., Simpson G. (2020). A data driven approach to investigate the chemical variability of clinopyroxenes from the 2014–2015 Holuhraun–Bárdarbunga eruption (Iceland). <i>Frontiers in Earth Science</i>. <a href="https://doi.org/10.3389/feart.2020.00018">10.3389/feart.2020.00018</a></li>
+              <li>Petrelli M., Bizzarri R., Morgavi D., Baldanza A., Perugini D. (2017). Combining machine learning techniques, microanalyses and large geochemical datasets for tephrochronological studies in complex volcanic areas. <i>Quaternary Geochronology</i>. <a href="https://doi.org/10.1016/j.quageo.2016.12.003">10.1016/j.quageo.2016.12.003</a></li>
+              <li>Petrelli M., Perugini D. (2016). Solving petrological problems through machine learning: the study case of tectonic discrimination using geochemical and isotopic data. <i>Contributions to Mineralogy and Petrology</i>. <a href="https://doi.org/10.1007/s00410-016-1292-2">10.1007/s00410-016-1292-2</a></li>
+            </ol>
+          </details>
+        </article>
+
+        <article class="topic">
+          <h3>Dynamics and timescales of volcanic plumbing systems</h3>
+          <p>This line of research focuses on the geochemical, petrological, and volcanological characterisation of magmatic systems, with particular emphasis on estimating the timescales of magmatic processes that occur in volcanic plumbing systems before eruptions. To do that, I combine numerical methods, experimental petrology, and the study of natural samples. The main aim is to provide methods and tools that support public authorities and decision-makers in volcanic hazard assessment and risk mitigation.</p>
+          <details>
+            <summary>Selected publications (6)</summary>
+            <ol class="refs">
+              <li>Petrelli M., Ágreda López M., Pisello A., Perugini D. (2023). Pre-eruptive dynamics at the Campi Flegrei Caldera: from evidence of magma mixing to timescales estimates. <i>Earth, Planets and Space</i>. <a href="https://doi.org/10.1186/s40623-023-01765-z">10.1186/s40623-023-01765-z</a></li>
+              <li>Rooyakkers S.M., Stix J., Berlo K., Petrelli M., Sigmundsson F. (2021). Eruption risks from covert silicic magma bodies. <i>Geology</i>. <a href="https://doi.org/10.1130/G48697.1">10.1130/G48697.1</a></li>
+              <li>Petrelli M., Zellmer G.F. (2020). Rates and timescales of magma transfer, storage, emplacement, and eruption. In <i>Dynamic Magma Evolution</i>, Geophysical Monograph Series 254, AGU and Wiley. <a href="https://doi.org/10.1002/9781119521143.ch1">10.1002/9781119521143.ch1</a></li>
+              <li>Petrelli M., El Omari K., Spina L., Le Guer Y., La Spina G., Perugini D. (2018). Timescales of water accumulation in magmas and implications for short warning times of explosive eruptions. <i>Nature Communications</i>. <a href="https://doi.org/10.1038/s41467-018-02987-6">10.1038/s41467-018-02987-6</a></li>
+              <li>Petrelli M., El Omari K., Le Guer Y., Perugini D. (2016). Effects of chaotic advection on the timescales of cooling and crystallization of magma bodies at mid crustal levels. <i>Geochemistry, Geophysics, Geosystems</i>. <a href="https://doi.org/10.1002/2015GC006109">10.1002/2015GC006109</a></li>
+              <li>Petrelli M., Perugini D., Poli G. (2011). Transition to chaos and implications for time-scales of magma hybridization during mixing processes in magma chambers. <i>Lithos</i> 125, 211–221. <a href="https://doi.org/10.1016/j.lithos.2011.02.007">10.1016/j.lithos.2011.02.007</a></li>
+            </ol>
+          </details>
+        </article>
+
+        <article class="topic">
+          <h3>The LA-ICP-MS laboratory in Perugia</h3>
+          <p>In 2001, I started developing the LA-ICP-MS laboratory at the Department of Geology, University of Perugia. Since 2002 (with a pause from 2010 to 2014), I have run it: maintaining the instruments, developing analytical protocols, analysing natural and experimental samples, and supporting external users. The laboratory now hosts two LA-ICP-MS systems and is involved in many scientific projects, with the active and invaluable support of Mónica Ágreda López.</p>
+          <details>
+            <summary>Selected publications (3)</summary>
+            <ol class="refs">
+              <li>Petrelli M., Laeger K., Perugini D. (2016). High spatial resolution trace element determination of geological samples by laser ablation quadrupole plasma mass spectrometry: implications for glass analysis in volcanic products. <i>Geosciences Journal</i>. <a href="https://doi.org/10.1007/s12303-016-0007-z">10.1007/s12303-016-0007-z</a></li>
+              <li>Alagna K.E., Petrelli M., Perugini D., Poli G. (2008). Micro-analytical zircon and monazite U-Pb isotope dating by laser ablation-inductively coupled plasma-quadrupole mass spectrometry. <i>Geostandards and Geoanalytical Research</i>. <a href="https://doi.org/10.1111/j.1751-908X.2008.00866.x">10.1111/j.1751-908X.2008.00866.x</a></li>
+              <li>Petrelli M., Caricchi L., Ulmer P. (2007). Application of high spatial resolution laser ablation ICP-MS to crystal-melt trace element partition coefficient determination. <i>Geostandards and Geoanalytical Research</i>. <a href="https://doi.org/10.1111/j.1751-908X.2007.00825.x">10.1111/j.1751-908X.2007.00825.x</a></li>
+            </ol>
+          </details>
+        </article>
+
+        <h3 class="sub">PhD students</h3>
+        <div class="students">
+          <p><strong>Mónica Ágreda López</strong> <span>Unravelling plumbing system dynamics by machine learning</span></p>
+          <p><strong>Giulia Fisauli</strong> <span>Tephra investigation coupling conventional and machine learning techniques</span></p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- FUNDING ====================================================== -->
+  <section class="section dark" id="funding" aria-labelledby="funding-title">
+    <div class="wrap section-grid">
+      <h2 id="funding-title">Funding</h2>
+      <div class="content-wide">
+        <p class="intro">Over the past few years, I have secured approximately €6 million in competitive funding. I am always eager to build new connections that broaden my skills and enrich my perspective, and I strongly believe that collaboration is essential to advancing research and generating new knowledge.</p>
+
+        <ol class="grants">
+          <li class="grant">
+            <span class="years num">2026–2030</span>
+            <div>
+              <h3><b>REALISE</b>: Bridging Igneous Petrology and Machine Learning for Science and Society. Deriving New Skills in Volcanic Hazard Assessment and the Economy of Critical Raw Materials</h3>
+              <p>MSCA Doctoral Network. PI and coordinator. <a href="https://doi.org/10.3030/101226206">DOI 10.3030/101226206</a>, <a href="https://realise-dn.eu/">REALISE website</a></p>
+            </div>
+            <span class="amount num">€4,356,827.64</span>
+          </li>
+          <li class="grant">
+            <span class="years num">2026–2030</span>
+            <div>
+              <h3><b>REALI3SE</b>: Bridging Igneous Petrology and Machine Learning through Intersectoral, Interdisciplinary, and Intercontinental Staff Exchanges</h3>
+              <p>MSCA Staff Exchanges. PI and coordinator. <a href="https://doi.org/10.3030/101299493">DOI 10.3030/101299493</a>, <a href="https://reali3se.eu/">REALI3SE website</a></p>
+            </div>
+            <span class="amount num">€1,172,340</span>
+          </li>
+          <li class="grant">
+            <span class="years num">2024–2025</span>
+            <div>
+              <h3><b>VOLC-LAPSE</b>: Exploring uncharted realms of volcanic eruptions using experimental petrology and ground deformation data</h3>
+              <p>MUR PNRR, RETURN extended partnership (Multi-risk science for resilient communities under a changing climate), Spoke 3 Earthquakes and volcanoes, cascade funding. Co-principal investigator.</p>
+            </div>
+            <span class="amount num">€350,000</span>
+          </li>
+          <li class="grant">
+            <span class="years num">2024–2025</span>
+            <div>
+              <h3><b>AI-VISIO-LAB</b>: Prototyping an Immersive Platform for Scientific Big Data Processing and Visualization in Astrophysics and Planetary Geology</h3>
+              <p>MUR PNRR, ICSC National Research Center for High-Performance Computing, Big Data and Quantum Computing, Spoke 3 Astrophysics and Cosmos Observation, cascade funding. Principal investigator.</p>
+            </div>
+            <span class="amount num">about €200,000</span>
+          </li>
+          <li class="grant">
+            <span class="years num">2024–2026</span>
+            <div>
+              <h3>Civil Safety and Security for Society</h3>
+              <p>University of Perugia, base research funding. Work package leader.</p>
+            </div>
+            <span class="amount num">€120,000 <small>work package, of €450,000 total</small></span>
+          </li>
+          <li class="grant">
+            <span class="years num">2024–2025</span>
+            <div>
+              <h3><b>COMET</b>: Consolidating the radiocarbon calibration over the 12–40 ka interval using paired <sup>14</sup>C and <sup>40</sup>Ar/<sup>39</sup>Ar dating of Mediterranean tephra</h3>
+              <p>MUR PRIN. Research unit leader.</p>
+            </div>
+            <span class="amount num">about €100,000 <small>research unit, of €229,824 total</small></span>
+          </li>
+          <li class="grant">
+            <span class="years num">2024–2026</span>
+            <div>
+              <h3><b>VolCA</b>, Volcanoes for Cryosphere and Atmosphere: volcano plumbing systems and eruptions in northern Victoria Land, implications for ice cover and atmospheric circulation</h3>
+              <p>MUR PNRA. Research unit leader.</p>
+            </div>
+            <span class="amount num">about €100,000 <small>research unit, of about €300,000 total</small></span>
+          </li>
+          <li class="grant">
+            <span class="years num">2023–2024</span>
+            <div>
+              <h3>Study of Multi-Hazard Scenarios for Natural Disasters in Central-Southern Italy and Sicily: Understanding the Past and Present to Protect the Future</h3>
+              <p>University of Perugia, base research funding. Principal investigator.</p>
+            </div>
+            <span class="amount num">about €95,000</span>
+          </li>
+        </ol>
+      </div>
+    </div>
+  </section>
+
+  <!-- BOOKS ======================================================== -->
+  <section class="section" id="books" aria-labelledby="books-title">
+    <div class="wrap section-grid">
+      <h2 id="books-title">Books</h2>
+      <div class="content">
+        <article class="book">
+          <span class="book-year">2023</span>
+          <div>
+            <h3>Machine Learning for Earth Sciences <span class="subtitle">Using Python to Solve Geological Problems</span></h3>
+            <p>This textbook introduces the reader to machine learning applications in Earth Sciences. It starts with the basics of machine learning and its potential to solve geological problems, describes the main Python tools for ML and the typical workflow of ML applications in Earth Sciences, and explains how the algorithms work. It gives many worked examples: clustering and dimensionality reduction in petro-volcanological studies, clustering of multi-spectral data, well-log facies classification, and machine-learning regression in petrology. It also introduces parallel computing and how to scale ML models in the cloud. The book is for Earth scientists at any level, from students to academics and professionals.</p>
+            <p class="cite">Petrelli M. (2023). Machine Learning for Earth Sciences: Using Python to Solve Geological Problems. Springer Textbooks in Earth Sciences, Geography and Environment. Springer Cham. DOI 10.1007/978-3-031-35114-3</p>
+            <p class="links">
+              <a href="https://link.springer.com/book/10.1007/978-3-031-35114-3">Get the book from Springer</a>
+              <a href="https://github.com/petrelli-m/machine_learning_earth_sciences">Code listings on GitHub</a>
+            </p>
+          </div>
+        </article>
+
+        <article class="book">
+          <span class="book-year">2021</span>
+          <div>
+            <h3>Introduction to Python in Earth Science Data Analysis <span class="subtitle">From Descriptive Statistics to Machine Learning</span></h3>
+            <p>This textbook introduces Python programming for exploring and modelling data in the Earth Sciences. It takes the reader from the very first steps, setting up the environment and writing the first lines of code, to confident use of Python for visualising, analysing and modelling Earth Science data. Every chapter contains worked code examples, each commented in detail. It is written for complete beginners and can be used in master’s and PhD courses; early-career and experienced researchers who want to start using Python for geological problems will also benefit from it.</p>
+            <p class="cite">Petrelli M. (2021). Introduction to Python in Earth Science Data Analysis: From Descriptive Statistics to Machine Learning. Springer Textbooks in Earth Sciences, Geography and Environment. Springer Cham. DOI 10.1007/978-3-030-78055-5</p>
+            <p class="links">
+              <a href="https://www.springer.com/gp/book/9783030780548">Get the book from Springer</a>
+              <a href="https://github.com/petrelli-m/python_earth_science_book">Code listings on GitHub</a>
+              <a href="https://nbviewer.jupyter.org/github/petrelli-m/python_earth_science_book/blob/19ef89d44a33d53dbc73796117e7497157154643/Jupyter_Notebooks/appendix_a/resources_for_geologists.ipynb">Python libraries for geologists</a>
+            </p>
+          </div>
+        </article>
+
+        <p class="note">I love sharing the content of these books in short courses everywhere. If you would like me to visit your institution, <a href="mailto:maurizio.petrelli@unipg.it">write to me</a>.</p>
+      </div>
+    </div>
+  </section>
+
+  <!-- TEACHING ===================================================== -->
+  <section class="section" id="teaching" aria-labelledby="teaching-title">
+    <div class="wrap section-grid">
+      <h2 id="teaching-title">Teaching</h2>
+      <div class="content">
+        <h3>University of Perugia</h3>
+        <ul class="timeline">
+          <li><span class="when num">2019 – now</span> <span>Introduction to experimental petro-volcanology <span class="where">Master’s degree in Geological Sciences and Technologies</span></span></li>
+          <li><span class="when num">2019 – now</span> <span>Mathematical methods in Earth Sciences <span class="where">Master’s degree in Geological Sciences and Technologies</span></span></li>
+          <li><span class="when num">2017 – 2019</span> <span>Data analysis and data interpretation in geological sciences <span class="where">Master’s degree in Geological Sciences and Technologies</span></span></li>
+          <li><span class="when num">2015 – 2016</span> <span>Igneous petrology <span class="where">Master’s degree in Geological Sciences and Technologies</span></span></li>
+        </ul>
+
+        <h3 class="sub">Short courses</h3>
+        <ul class="timeline">
+          <li><span class="when num">Mar 2023</span> <span>Introduction to Machine Learning for the Earth Sciences <span class="where">Department of Petrology and Geochemistry, Eötvös University Budapest (ELTE)</span></span></li>
+          <li><span class="when num">Feb 2023</span> <span>Introduction to Machine Learning for the Earth Sciences <span class="where">Institut für Mineralogie, Leibniz Universität Hannover</span></span></li>
+          <li><span class="when num">Aug 2022</span> <span>Introduction to Machine Learning in Python for the Earth Sciences <span class="where">Zhejiang University, remote teaching</span></span></li>
+          <li><span class="when num">May 2022</span> <span>Introduction to Python Programming in Earth Sciences <span class="where">Universidade dos Açores</span></span></li>
+          <li><span class="when num">Aug 2021</span> <span>Introduction to Python Programming in Earth Sciences <span class="where">Zhejiang University, remote teaching</span></span></li>
+          <li><span class="when num">Feb 2020</span> <span>Introduction to Python Programming in Earth Sciences <span class="where">Institut für Mineralogie, Leibniz Universität Hannover</span></span></li>
+          <li><span class="when num">Dec 2018</span> <span>Introduction to Python Programming in Earth Sciences <span class="where">Department of Petrology and Geochemistry, Eötvös University Budapest (ELTE)</span></span></li>
+        </ul>
+      </div>
+    </div>
+  </section>
+
+  <!-- SERVICE AND TALKS ============================================ -->
+  <section class="section" id="service" aria-labelledby="service-title">
+    <div class="wrap section-grid">
+      <h2 id="service-title">Service and talks</h2>
+      <div class="content">
+        <h3>Editorial roles</h3>
+        <ul class="timeline">
+          <li><span class="when num">2022 – now</span> <span>Associate Editor, <i>Artificial Intelligence in Geosciences</i></span></li>
+          <li><span class="when num">2020 – now</span> <span>Associate Editor, <i>American Mineralogist</i></span></li>
+          <li><span class="when num">2015 – 2019</span> <span>Guest Associate Editor, <i>American Mineralogist</i>, special collection “Dynamics of Magmatic Processes”</span></li>
+        </ul>
+
+        <h3 class="sub">Invited talks and seminars</h3>
+        <ul class="timeline">
+          <li><span class="when num">Feb 2026</span> <span>Invited workshops on machine learning in igneous petrology <span class="where">China University of Geosciences (Prof. K. Qiu), Zhejiang University (Prof. ZhangZhou) and Hong Kong University (Prof. Weiran Li)</span></span></li>
+          <li><span class="when num">Jul 2024</span> <span>“Modern igneous petrology needs more, high-quality, data: a tribute to GEOROC and PetDB” <span class="where">Invited talk, Goldschmidt 2024, Chicago. Session “25 years of GEOROC and PetDB: the past, present and future of research with global geochemical databases”</span></span></li>
+          <li><span class="when num">2024</span> <span>“Machine learning in igneous petrology and volcanology: state-of-the-art and perspectives” <span class="where">EGU General Assembly 2024, Vienna</span></span></li>
+          <li><span class="when num">Jan 2024</span> <span>“Machine learning in petrology and volcanology: state-of-the-art and perspectives” <span class="where">Invited talk, Machine Learning in Solid Earth Geoscience workshop, Santa Fe. Organised by the Center for NonLinear Studies at Los Alamos National Laboratory and the Department of Energy Office of Basic Science, Geoscience Program</span></span></li>
+          <li><span class="when num">Jun 2023</span> <span>“Machine learning applications in petrology and volcanology: state-of-the-art and perspectives” <span class="where">Invited seminars, China University of Geosciences (Prof. K. Qiu) and Zhejiang University (Prof. ZhangZhou), Beijing and Hangzhou</span></span></li>
+          <li><span class="when num">Sep 2019</span> <span>“Volcanic plumbing system dynamics: unraveling rates and timescales of magma transfer, storage, and eruption” <span class="where">Keynote, Joint SIMP, SGI and SOGEI Congress, Parma</span></span></li>
+        </ul>
+
+        <h3 class="sub">Sessions and workshops organised</h3>
+        <ul class="timeline">
+          <li><span class="when num">Dec 2025</span> <span>“Advances in Machine Learning for Solid Earth Geoscience” <span class="where">AGU Fall Meeting, New Orleans</span></span></li>
+          <li><span class="when num">Jul 2023</span> <span>“Dynamics and timescales in magmatic reservoirs, conduits and dikes” <span class="where">Goldschmidt 2023, Lyon</span></span></li>
+          <li><span class="when num">Jul 2022</span> <span>“From source to surface: characterizing magma generation and ascent processes from the rock record” <span class="where">Goldschmidt 2022, Honolulu</span></span></li>
+          <li><span class="when num">Jun 2020</span> <span>“Constraining petrological and geochemical variations in magmas to capture the evolution of volcanoes over space and time” <span class="where">Goldschmidt 2020, virtual</span></span></li>
+          <li><span class="when num">May 2020</span> <span>“The dynamics of magmatic plumbing system” <span class="where">EGU General Assembly 2020, virtual</span></span></li>
+          <li><span class="when num">Apr 2019</span> <span>“Rates, timescales and mechanisms of magmatic and volcanic processes: from mantle source to emplacement or eruption” <span class="where">EGU General Assembly 2019, Vienna</span></span></li>
+          <li><span class="when num">Dec 2018</span> <span>“Origin and timescales of magmatic systems: discussing ages, rates, transport, and storage processes of magmas from the source to emplacement or eruption” <span class="where">AGU Fall Meeting, Washington DC</span></span></li>
+          <li><span class="when num">Dec 2017</span> <span>“Processes of magma crystallization from depth to surface” <span class="where">AGU Fall Meeting, New Orleans</span></span></li>
+          <li><span class="when num">Nov 2016</span> <span>“Mind the gap! Techniques to overcome multi-scale issues in geological and geomorphic processes” <span class="where">Cities on Volcanoes 9, Puerto Varas, Chile</span></span></li>
+          <li><span class="when num">Jun 2016 – now</span> <span>International workshop “Application of Laser Ablation Inductively Coupled Plasma Mass Spectrometry (LA-ICP-MS) to Earth Sciences” <span class="where">Perugia</span></span></li>
+          <li><span class="when num">Apr 2016</span> <span>“Mind the gap! Techniques to overcome multi-scale issues in geological and geomorphic processes” <span class="where">EGU General Assembly 2016, Vienna</span></span></li>
+          <li><span class="when num">Aug 2015</span> <span>“Dynamics of magmatic processes: from magma mixing to crystal residence time” <span class="where">Goldschmidt 2015, Prague</span></span></li>
+        </ul>
+      </div>
+    </div>
+  </section>
+
+  <!-- PUBLICATIONS =================================================
+       One <li> per publication, grouped by year, newest first.
+       data-type is "article", "book" or "chapter" (used by the filter).
+       To add a paper: copy an <li>, edit it, and place it under its year.
+  -->
+  <section class="section" id="publications" aria-labelledby="publications-title">
+    <div class="wrap section-grid">
+      <h2 id="publications-title">Publications</h2>
+      <div class="content-wide">
+        <p class="intro">Books, book chapters and journal articles, newest first. For citation metrics and the complete record, see my <a href="https://www.scopus.com/authid/detail.uri?authorId=56962729500">Scopus profile</a>.</p>
+
+        <div class="pub-tools" id="pub-tools" hidden>
+          <label class="visually-hidden" for="pub-search">Search publications</label>
+          <input class="pub-search" id="pub-search" type="search" placeholder="Search by title, author, journal or year" autocomplete="off">
+          <div class="filters" role="group" aria-label="Publication type">
+            <button type="button" data-filter="all" aria-pressed="true">All<span class="count"></span></button>
+            <button type="button" data-filter="article" aria-pressed="false">Articles<span class="count"></span></button>
+            <button type="button" data-filter="book" aria-pressed="false">Books<span class="count"></span></button>
+            <button type="button" data-filter="chapter" aria-pressed="false">Chapters<span class="count"></span></button>
+          </div>
+        </div>
+        <p class="pub-status" id="pub-status" aria-live="polite"></p>
+
+        <div id="pub-list">
+          <section class="pub-year">
+            <h3>2026</h3>
+            <ol>
+              <li data-type="article">
+                <cite><a href="https://doi.org/10.1093/petrology/egag015">Experimental Constraints on the Impact of Shear Strain Rate on Early Crystallisation Dynamics and Residual Glass Composition: Implication for Magma Evolution in Natural Systems</a></cite>
+                <p>Musu A.; Vetere F.; Griffiths T.; <strong>Petrelli M.</strong>; Corsaro R.A.; Pisello A.; Peres S.; Perugini D.; Caricchi L. <i>Journal of Petrology</i>. doi:10.1093/petrology/egag015</p>
+              </li>
+              <li data-type="article">
+                <cite><a href="https://doi.org/10.1007/s00710-025-00941-1">Spatial mineral chemistry of volcanic rocks from the Karacadağ Volcanic Complex and Karapinar Volcanic Field (Central Anatolia): evidence for a trans-crustal magmatic system</a></cite>
+                <p>Korkmaz G.G.; Kurt H.; Asan K.; <strong>Petrelli M.</strong>; Leybourne M. <i>Mineralogy and Petrology</i>. doi:10.1007/s00710-025-00941-1</p>
+              </li>
+              <li data-type="article">
+                <cite><a href="https://doi.org/10.5194/ejm-38-9-2026">Trace element distribution between rhyolitic melts and minerals in highly crystalline assemblages: experimental approach using a quartz trap</a></cite>
+                <p>Vetere F.; Schimetzek K.; <strong>Petrelli M.</strong>; Parat F.; Stechern A.; Singer C.; Holtz F. <i>European Journal of Mineralogy</i>. doi:10.5194/ejm-38-9-2026</p>
+              </li>
+              <li data-type="article">
+                <cite><a href="https://doi.org/10.1016/j.jvolgeores.2026.108531">Unravelling the volcanic history of the Campanian Plain: A detailed study of mid-distance successions between 40 and 130 ka</a></cite>
+                <p>Totaro F.; Petrosino P.; Arienzo I.; Di Vito M.A.; <strong>Petrelli M.</strong>; Jicha B.R.; D'Antonio M. <i>Journal of Volcanology and Geothermal Research</i>. doi:10.1016/j.jvolgeores.2026.108531</p>
+              </li>
+            </ol>
+          </section>
+          <section class="pub-year">
+            <h3>2025</h3>
+            <ol>
+              <li data-type="chapter">
+                <cite>Methodological Advances in Volcanology: The Role of Artificial Intelligence in Volcano Monitoring, Modelling, and Hazard Assessment</cite>
+                <p><span class="pub-kind">Book chapter.</span> <strong>Petrelli M.</strong>; Anantrasirichai N.; Bean C.J.; Biggs J.; Malfante M.; Wilding J.D.; Zhu W. <i>The Encyclopedia of Volcanoes, 3rd edition (Bonadonna C., ed.). Elsevier. Accepted for publication</i></p>
+              </li>
+              <li data-type="article">
+                <cite><a href="https://doi.org/10.1016/j.chemer.2025.126289">Deciphering the magmatic evolution of the Hyblean Cretaceous volcanism (SE Sicily, Italy): New geochemical, isotopic and noble gas analyses</a></cite>
+                <p>Di Bella M.; Romano D.; Volpi V.; Italiano F.; Correale A.; <strong>Petrelli M.</strong>; De Rosa G.; Tripodo A.; Sabatino G. <i>Geochemistry</i>. doi:10.1016/j.chemer.2025.126289</p>
+              </li>
+              <li data-type="article">
+                <cite><a href="https://doi.org/10.1002/esp.6039">Last interglacial paleoshoreline location and tectono-stratigraphic evolution of the peri-Tyrrhenian Sarno basin, southern Italy, constrained by tephrostratigraphy</a></cite>
+                <p>Totaro F.; Petrosino P.; Valente E.; Arienzo I.; D'Antonio M.; Di Vito M.A.; Giaccio B.; Jicha B.R.; <strong>Petrelli M.</strong>; Santangelo N.; Santo A.; Zanchetta G. <i>Earth Surface Processes and Landforms</i>. doi:10.1002/esp.6039</p>
+              </li>
+              <li data-type="article">
+                <cite><a href="https://doi.org/10.1111/jmg.12810">Multi-Stage Growth of Kyanite in Migmatites Interpreted by Integrating Forward Thermodynamic Modelling and Trace Element Signature</a></cite>
+                <p>Nerone S.; Groppo C.; Ágreda-López M.; <strong>Petrelli M.</strong>; Rolfo F. <i>Journal of Metamorphic Geology</i>. doi:10.1111/jmg.12810</p>
+              </li>
+              <li data-type="article">
+                <cite><a href="https://doi.org/10.1016/j.aiig.2025.100153">Opportunities, epistemological assessment and potential risks of machine learning applications in volcano science</a></cite>
+                <p>Ágreda-López M.; <strong>Petrelli M.</strong> <i>Artificial Intelligence in Geosciences</i>. doi:10.1016/j.aiig.2025.100153</p>
+              </li>
+              <li data-type="article">
+                <cite><a href="https://doi.org/10.1016/j.acags.2025.100270">Orange-Volcanoes: A new open and collaborative platform to perform data-driven investigations and machine learning analyses in petrology and volcanology</a></cite>
+                <p>Musu A.; Parodi V.; Toplak M.; Carfì A.; Ágreda-López M.; Mastrogiovanni F.; ZhangZhou J.; Perugini D.; Belmonte D.; Wieser P.E.; Zupan B.; <strong>Petrelli M.</strong> <i>Applied Computing and Geosciences</i>. doi:10.1016/j.acags.2025.100270</p>
+              </li>
+              <li data-type="article">
+                <cite><a href="https://doi.org/10.1007/s00410-025-02257-x">Petrogenesis and amphibole–melt trace element partitioning of the 156 ka Haramul Mic crystal-rich dacite, Ciomadul, Romania</a></cite>
+                <p>Pánczél E.; Harangi S.; <strong>Petrelli M.</strong>; Popa R.; Virág A.; Seghedi I.; Bachmann O.; Lukács R. <i>Contributions to Mineralogy and Petrology</i>. doi:10.1007/s00410-025-02257-x</p>
+              </li>
+              <li data-type="article">
+                <cite><a href="https://doi.org/10.1007/s00445-025-01900-6">Robust statistical analysis of an englacial tephra sequence unveils previously unrecognized explosive eruptions at Mount Melbourne (Antarctica)</a></cite>
+                <p>Fisauli G.; Del Carlo P.; Di Roberto A.; Re G.; Musu A.; Giudice G.; <strong>Petrelli M.</strong> <i>Bulletin of Volcanology</i>. doi:10.1007/s00445-025-01900-6</p>
+              </li>
+              <li data-type="article">
+                <cite><a href="https://doi.org/10.1007/s00445-025-01911-3">Tephrochronology of the NDT09 core in the Marsili basin: implications for the timing and dynamics of volcanic eruptions of the southern Tyrrhenian in the last c. 15 ka</a></cite>
+                <p>Di Roberto A.; Re G.; Insinga D.D.; Scateni B.; Caricchi C.; Siravo G.; <strong>Petrelli M.</strong>; Fisauli G.; Cascella A.; Bronzo L.; Lirer F.; Macrì P. <i>Bulletin of Volcanology</i>. doi:10.1007/s00445-025-01911-3</p>
+              </li>
+              <li data-type="article">
+                <cite><a href="https://doi.org/10.1007/s00445-025-01865-6">The crystal cargo provides a chronicle of pre-caldera dynamics in mafic volcanic systems: insights from Colli Albani</a></cite>
+                <p>Ágreda-López M.; Musu A.; Jorgenson C.; Šala M.; Giordano G.; Caricchi L.; Stremtan C.; <strong>Petrelli M.</strong> <i>Bulletin of Volcanology</i>. doi:10.1007/s00445-025-01865-6</p>
+              </li>
+            </ol>
+          </section>
+          <section class="pub-year">
+            <h3>2024</h3>
+            <ol>
+              <li data-type="article">
+                <cite><a href="https://doi.org/10.1016/j.cageo.2024.105707">Enhancing machine learning thermobarometry for clinopyroxene-bearing magmas</a></cite>
+                <p>Ágreda-López M.; Parodi V.; Musu A.; Jorgenson C.; Carfì A.; Mastrogiovanni F.; Caricchi L.; Perugini D.; <strong>Petrelli M.</strong> <i>Computers and Geosciences</i>. doi:10.1016/j.cageo.2024.105707</p>
+              </li>
+              <li data-type="article">
+                <cite><a href="https://doi.org/10.1016/j.qsa.2024.100186">Explosive volcanic activity in Central-Southern Italy during Middle Pleistocene: A tale from tephra layers of the Acerno basin</a></cite>
+                <p>Pelullo C.; Arienzo I.; D'Antonio M.; Giaccio B.; Iovine R.S.; Leicher N.; Palladino D.M.; <strong>Petrelli M.</strong>; Petrosino P.; Russo Ermolli E.; Sottili G.; Totaro F.; Zanchetta G. <i>Quaternary Science Advances</i>. doi:10.1016/j.qsa.2024.100186</p>
+              </li>
+              <li data-type="article">
+                <cite><a href="https://doi.org/10.1093/petrology/egae036">Machine Learning in Petrology: State-of-the-Art and Future Perspectives</a></cite>
+                <p><strong>Petrelli M.</strong> <i>Journal of Petrology</i>. doi:10.1093/petrology/egae036</p>
+              </li>
+              <li data-type="article">
+                <cite><a href="https://doi.org/10.1016/j.gr.2024.01.004">Mid-Miocene silicic explosive volcanism of the Tokaj Mts., eastern-central Europe: Eruption chronology, geochemical fingerprints and petrogenesis</a></cite>
+                <p>Lukács R.; Guillong M.; Szepesi J.; Szymanowski D.; Portnyagin M.; Józsa S.; Bachmann O.; <strong>Petrelli M.</strong>; Müller S.; Schiller D.; Fodor L.; Chelle-Michou C.; Harangi S. <i>Gondwana Research</i>. doi:10.1016/j.gr.2024.01.004</p>
+              </li>
+              <li data-type="article">
+                <cite><a href="https://doi.org/10.1093/petrology/egae027">Textures and Chemistry of Crystal Cargo of the Pleiades Volcanic Field, Antarctica: Potential Influence of Ice Load in Modulating the Plumbing System</a></cite>
+                <p>Irene R.; Alice T.; Matteo M.; <strong>Maurizio P.</strong>; López Mónica Á.; Sergio R. <i>Journal of Petrology</i>. doi:10.1093/petrology/egae027</p>
+              </li>
+              <li data-type="article">
+                <cite><a href="https://doi.org/10.2138/am-2023-9092">The application of “transfer learning” in optical microscopy: The petrographic classification of opaque minerals</a></cite>
+                <p>Cai Y.-W.; Qiu K.-F.; <strong>Petrelli M.</strong>; Hou Z.-L.; Santosh M.; Yu H.-C.; Armstrong R.T.; Deng J. <i>American Mineralogist</i>. doi:10.2138/am-2023-9092</p>
+              </li>
+              <li data-type="article">
+                <cite><a href="https://doi.org/10.1016/j.epsl.2024.118934">The role of deformation on the early crystallization and rheology of basaltic liquids</a></cite>
+                <p>Vetere F.; Merseburger S.; Pisello A.; Perugini D.; Viti C.; <strong>Petrelli M.</strong>; Musu A.; Almeev R.; Caricchi L.; Iezzi G.; Cassetta M.; Holtz F. <i>Earth and Planetary Science Letters</i>. doi:10.1016/j.epsl.2024.118934</p>
+              </li>
+              <li data-type="article">
+                <cite><a href="https://doi.org/10.1007/s00531-024-02410-0">Transtension or transpression? Tectono-metamorphic constraints on the formation of the Monte Grighini dome (Sardinia, Italy) and implications for the Southern European Variscan belt</a></cite>
+                <p>Petroccia A.; Carosi R.; Montomoli C.; Iaccarino S.; Forshaw J.B.; <strong>Petrelli M.</strong> <i>International Journal of Earth Sciences</i>. doi:10.1007/s00531-024-02410-0</p>
+              </li>
+            </ol>
+          </section>
+          <section class="pub-year">
+            <h3>2023</h3>
+            <ol>
+              <li data-type="book">
+                <cite><a href="https://doi.org/10.1007/978-3-031-35114-3">Machine Learning for Earth Sciences: Using Python to Solve Geological Problems</a></cite>
+                <p><span class="pub-kind">Book.</span> <strong>Petrelli M.</strong> <i>Springer Textbooks in Earth Sciences, Geography and Environment. Springer Cham</i>. doi:10.1007/978-3-031-35114-3</p>
+              </li>
+              <li data-type="article">
+                <cite><a href="https://doi.org/10.1016/j.qsa.2023.100079">Cryptotephras in the marine sediment record of the Edisto Inlet, Ross Sea: Implications for the volcanology and tephrochronology of northern Victoria Land, Antarctica</a></cite>
+                <p>Di Roberto A.; Re G.; Scateni B.; <strong>Petrelli M.</strong>; Tesi T.; Capotondi L.; Morigi C.; Galli G.; Colizza E.; Melis R.; Torricella F.; Giordano P.; Giglio F.; Gallerani A.; Gariboldi K. <i>Quaternary Science Advances</i>. doi:10.1016/j.qsa.2023.100079</p>
+              </li>
+              <li data-type="article">
+                <cite><a href="https://doi.org/10.2138/am-2022-8536">Experimental investigation of trace element partitioning between amphibole and alkali basaltic melt: Toward a more general partitioning model with implications for amphibole fractionation at deep crustal levels</a></cite>
+                <p>Bonechi B.; Fabbrizio A.; Perinelli C.; Gaeta M.; <strong>Petrelli M.</strong> <i>American Mineralogist</i>. doi:10.2138/am-2022-8536</p>
+              </li>
+              <li data-type="article">
+                <cite><a href="https://doi.org/10.3390/min13020192">Geochemical Studies of Detrital Zircon Grains from the River Banks and Beach Placers of Coastal Odisha, India</a></cite>
+                <p>Mohanty S.; Papadopoulos A.; <strong>Petrelli M.</strong>; Papadopoulou L.; Sengupta D. <i>Minerals</i>. doi:10.3390/min13020192</p>
+              </li>
+              <li data-type="article">
+                <cite><a href="https://doi.org/10.1093/petrology/egad038">Melt Inclusions in Arclogitic Xenoliths Constrain the Genesis of the Lower Continental Arc Crust beneath the Northern Volcanic Zone, Colombia</a></cite>
+                <p>Gianola O.; Costa B.; Ferri F.; Gilio M.; <strong>Petrelli M.</strong>; Murri M.; Barbaro A.; Alvaro M.; Rodríguez-Vargas A.; Poli S.; Cesare B. <i>Journal of Petrology</i>. doi:10.1093/petrology/egad038</p>
+              </li>
+              <li data-type="article">
+                <cite><a href="https://doi.org/10.1007/s00445-022-01621-0">Pre-eruptive Conditions of the 3 March 2015 Lava Fountain of Villarrica Volcano (Southern Andes)</a></cite>
+                <p>Romero J.E.; Morgado E.; Pisello A.; Boschetty F.; <strong>Petrelli M.</strong>; Cáceres F.; Alam M.A.; Polacci M.; Palma J.L.; Arzilli F.; Vera F.; Gutiérrez R.; Morgavi D. <i>Bulletin of Volcanology</i>. doi:10.1007/s00445-022-01621-0</p>
+              </li>
+              <li data-type="article">
+                <cite><a href="https://doi.org/10.1186/s40623-023-01765-z">Pre-eruptive dynamics at the Campi Flegrei Caldera: from evidence of magma mixing to timescales estimates</a></cite>
+                <p><strong>Petrelli M.</strong>; Ágreda López M.; Pisello A.; Perugini D. <i>Earth, Planets and Space</i>. doi:10.1186/s40623-023-01765-z</p>
+              </li>
+              <li data-type="article">
+                <cite><a href="https://doi.org/10.1130/G51097.1">Revealing the link between A-type granites and hottest melts from residual metasedimentary crust</a></cite>
+                <p>Carvalho B.B.; Bartoli O.; Cesare B.; Satish-Kumar M.; <strong>Petrelli M.</strong>; Kawakami T.; Hokada T.; Gilio M. <i>Geology</i>. doi:10.1130/G51097.1</p>
+              </li>
+              <li data-type="article">
+                <cite><a href="https://doi.org/10.1016/j.quageo.2022.101416">Statistically coherent approach involving log-ratio transformation of geochemical data enabled tephra correlations of two late Pleistocene tephra from the eastern Adriatic shelf</a></cite>
+                <p>Razum I.; Ilijanić N.; <strong>Petrelli M.</strong>; Pawlowsky-Glahn V.; Miko S.; Moska P.; Giaccio B. <i>Quaternary Geochronology</i>. doi:10.1016/j.quageo.2022.101416</p>
+              </li>
+              <li data-type="article">
+                <cite><a href="https://doi.org/10.1016/j.heliyon.2023.e19099">The blue road: Provenance study of azurite samples from historical locations through the analysis of minor and trace elements</a></cite>
+                <p>Capriotti S.; Medeghini L.; Mignardi S.; <strong>Petrelli M.</strong>; Botticelli M. <i>Heliyon</i>. doi:10.1016/j.heliyon.2023.e19099</p>
+              </li>
+              <li data-type="article">
+                <cite><a href="https://doi.org/10.1007/s00445-023-01643-2">The magmatic evolution of South-East Crater (Mt. Etna) during the February–April 2021 sequence of lava fountains from a mineral chemistry perspective</a></cite>
+                <p>Musu A.; Corsaro R.A.; Higgins O.; Jorgenson C.; <strong>Petrelli M.</strong>; Caricchi L. <i>Bulletin of Volcanology</i>. doi:10.1007/s00445-023-01643-2</p>
+              </li>
+            </ol>
+          </section>
+          <section class="pub-year">
+            <h3>2022</h3>
+            <ol>
+              <li data-type="article">
+                <cite><a href="https://doi.org/10.1029/2021JB022904">A Machine Learning-Based Approach to Clinopyroxene Thermobarometry: Model Optimization and Distribution for Use in Earth Sciences</a></cite>
+                <p>Jorgenson C.; Higgins O.; <strong>Petrelli M.</strong>; Bégué F.; Caricchi L. <i>Journal of Geophysical Research: Solid Earth</i>. doi:10.1029/2021JB022904</p>
+              </li>
+              <li data-type="article">
+                <cite><a href="https://doi.org/10.1038/s43247-022-00585-5">Basaltic Plinian eruptions at Las Sierras-Masaya volcano driven by cool storage of crystal-rich magmas</a></cite>
+                <p>Bamber E.C.; La Spina G.; Arzilli F.; de’ Michieli Vitturi M.; Polacci M.; Hartley M.E.; <strong>Petrelli M.</strong>; Fellowes J.; Burton M. <i>Communications Earth and Environment</i>. doi:10.1038/s43247-022-00585-5</p>
+              </li>
+              <li data-type="article">
+                <cite><a href="https://doi.org/10.1016/j.jsg.2022.104668">Chemical interaction driven by deep fluids in the damage zone of a seismogenic carbonate fault</a></cite>
+                <p>Marchesini B.; Carminati E.; Aldega L.; Mirabella F.; <strong>Petrelli M.</strong>; Caracausi A.; Barchi M.R. <i>Journal of Structural Geology</i>. doi:10.1016/j.jsg.2022.104668</p>
+              </li>
+              <li data-type="article">
+                <cite><a href="https://doi.org/10.2138/rmg.2022.87.13">Decrypting Magma Mixing in Igneous Systems</a></cite>
+                <p>Morgavi D.; Laumonier M.; <strong>Petrelli M.</strong>; Dingwell D.B. <i>Reviews in Mineralogy and Geochemistry</i>. doi:10.2138/rmg.2022.87.13</p>
+              </li>
+              <li data-type="article">
+                <cite><a href="https://doi.org/10.1016/j.sedgeo.2022.106237">Denudation of the Cordillera and intraplate belt in central Patagonia inferred by detrital multi-dating of foreland basin deposits</a></cite>
+                <p>Genge M.C.; Zattin M.; Witt C.; Derycke A.; Gautheron C.; Mazzoli S.; <strong>Petrelli M.</strong>; Cogné N.; Bosch D.; Bruguier O.; Marquez M. <i>Sedimentary Geology</i>. doi:10.1016/j.sedgeo.2022.106237</p>
+              </li>
+              <li data-type="article">
+                <cite><a href="https://doi.org/10.1007/s00410-022-01962-1">Inferences on the magmatic plumbing system at Stromboli volcano (Italy) from trace element geochemistry of matrix glasses and minerals in different types of explosive eruptions</a></cite>
+                <p>Landi P.; D’Oriano C.; <strong>Petrelli M.</strong>; Nazzari M.; Andronico D. <i>Contributions to Mineralogy and Petrology</i>. doi:10.1007/s00410-022-01962-1</p>
+              </li>
+              <li data-type="article">
+                <cite><a href="https://doi.org/10.3390/geosciences12030108">Magmatic Processes at Euganean Hills (Veneto Volcanic Province, Italy): Clinopyroxene Investigation to Unravel Magmatic Interactions</a></cite>
+                <p>Nazzareni S.; Morgavi D.; <strong>Petrelli M.</strong>; Bartoli O.; Perugini D. <i>Geosciences (Switzerland)</i>. doi:10.3390/geosciences12030108</p>
+              </li>
+              <li data-type="article">
+                <cite><a href="https://doi.org/10.1093/petrology/egac009">Pre-Eruptive Conditions and Dynamics Recorded in Banded Pumices from the El Abrigo Caldera-Forming Eruption (Tenerife, Canary Islands)</a></cite>
+                <p>González-García D.; <strong>Petrelli M.</strong>; Perugini D.; Giordano D.; Vasseur J.; Paredes-Mariño J.; Marti J.; Dingwell D.B. <i>Journal of Petrology</i>. doi:10.1093/petrology/egac009</p>
+              </li>
+              <li data-type="article">
+                <cite><a href="https://doi.org/10.1007/s00410-021-01881-7">Rifting and recharge as triggers of the mixed basalt–rhyolite Halarauður ignimbrite eruption (Krafla, Iceland)</a></cite>
+                <p>Rooyakkers S.M.; Stix J.; Berlo K.; Morgavi D.; <strong>Petrelli M.</strong>; Rusiecka M.K.; Barker S.J.; Charlier B.L.A.; Neave D.A.; Vetere F.P.; Perugini D. <i>Contributions to Mineralogy and Petrology</i>. doi:10.1007/s00410-021-01881-7</p>
+              </li>
+              <li data-type="article">
+                <cite><a href="https://doi.org/10.3390/universe8030156">The Achievements of the RockStar Group (Perugia) on Astrophysical Modelling and Pallasite Geochemistry</a></cite>
+                <p>Ricci L.; <strong>Petrelli M.</strong>; Frondini F.; Zucchini A.; Comodi P.; Bisciotti A.; Vescovi D.; Trippella O. <i>Universe</i>. doi:10.3390/universe8030156</p>
+              </li>
+              <li data-type="article">
+                <cite><a href="https://doi.org/10.1016/j.quascirev.2022.107797">The Fucino 250–170 ka tephra record: New insights on peri-Tyrrhenian explosive volcanism, central mediterranean tephrochronology, and timing of the MIS 8-6 climate variability</a></cite>
+                <p>Monaco L.; Leicher N.; Palladino D.M.; Arienzo I.; Marra F.; <strong>Petrelli M.</strong>; Nomade S.; Pereira A.; Sottili G.; Conticelli S.; D'Antonio M.; Fabbrizio A.; Jicha B.R.; Mannella G.; Petrosino P.; Regattieri E.; Tzedakis P.C.; Wagner B.; Zanchetta G.; Giaccio B. <i>Quaternary Science Reviews</i>. doi:10.1016/j.quascirev.2022.107797</p>
+              </li>
+              <li data-type="article">
+                <cite><a href="https://doi.org/10.3190/jgeosci.362">The role of peridotite and pyroxenite melts in the origin of the Karapınar basalts, Cappadocia Volcanic Province, Central Anatolia</a></cite>
+                <p>Gençoğlu Korkmaz G.; Kurt H.; Asan K.; <strong>Petrelli M.</strong>; Leybourne M. <i>Journal of Geosciences (Czech Republic)</i>. doi:10.3190/jgeosci.362</p>
+              </li>
+              <li data-type="article">
+                <cite><a href="https://doi.org/10.3390/geosciences12020054">The Österplana Fossil Meteorites and… What Else? Terrestrial Cr-Spinels and Zircons in the Ordovician Limestones of the Thorsberg Quarry (Sweden)</a></cite>
+                <p>Lenaz D.; Velicogna M.; <strong>Petrelli M.</strong>; Schmitz B. <i>Geosciences (Switzerland)</i>. doi:10.3390/geosciences12020054</p>
+              </li>
+              <li data-type="article">
+                <cite><a href="https://doi.org/10.30909/vol.05.02.349384">Thermobar: An open-source Python3 tool for thermobarometry and hygrometry</a></cite>
+                <p>Wieser P.E.; <strong>Petrelli M.</strong>; Lubbers J.; Wieser E.; Özaydın S.; Kent A.J.R.; Till C.B. <i>Volcanica</i>. doi:10.30909/vol.05.02.349384</p>
+              </li>
+              <li data-type="article">
+                <cite><a href="https://doi.org/10.3390/min12111439">Trace Elements in Chromian Spinels from Four Siberian Kimberlites</a></cite>
+                <p>Venier M.; Ziberna L.; Princivalle F.; <strong>Petrelli M.</strong>; Lughi V.; Logvinova A.; Sobolev N.V.; Turco G.; Lenaz D. <i>Minerals</i>. doi:10.3390/min12111439</p>
+              </li>
+            </ol>
+          </section>
+          <section class="pub-year">
+            <h3>2021</h3>
+            <ol>
+              <li data-type="book">
+                <cite><a href="https://doi.org/10.1007/978-3-030-78055-5">Introduction to Python in Earth Science Data Analysis: From Descriptive Statistics to Machine Learning</a></cite>
+                <p><span class="pub-kind">Book.</span> <strong>Petrelli M.</strong> <i>Springer Textbooks in Earth Sciences, Geography and Environment. Springer Cham</i>. doi:10.1007/978-3-030-78055-5</p>
+              </li>
+              <li data-type="article">
+                <cite><a href="https://doi.org/10.3389/feart.2021.749100">Editorial: Crystal Archives of Magmatic Processes</a></cite>
+                <p>Ubide T.; Neave D.A.; <strong>Petrelli M.</strong>; Longpré M.-A. <i>Frontiers in Earth Science</i>. doi:10.3389/feart.2021.749100</p>
+              </li>
+              <li data-type="article">
+                <cite><a href="https://doi.org/10.1016/j.chemgeo.2020.119967">Effect of fO2 on Eu partitioning between clinopyroxene, orthopyroxene and basaltic melt: Development of a Eu3+/Eu2+ oxybarometer</a></cite>
+                <p>Fabbrizio A.; Schmidt M.W.; <strong>Petrelli M.</strong> <i>Chemical Geology</i>. doi:10.1016/j.chemgeo.2020.119967</p>
+              </li>
+              <li data-type="article">
+                <cite><a href="https://doi.org/10.1130/G48697.1">Eruption risks from covert silicic magma bodies</a></cite>
+                <p>Rooyakkers S.M.; Stix J.; Berlo K.; <strong>Petrelli M.</strong>; Sigmundsson F. <i>Geology</i>. doi:10.1130/G48697.1</p>
+              </li>
+              <li data-type="article">
+                <cite><a href="https://doi.org/10.1016/j.gca.2021.04.023">High pressure trace element partitioning between clinopyroxene and alkali basaltic melts</a></cite>
+                <p>Bonechi B.; Perinelli C.; Gaeta M.; Fabbrizio A.; <strong>Petrelli M.</strong>; Strnad L. <i>Geochimica et Cosmochimica Acta</i>. doi:10.1016/j.gca.2021.04.023</p>
+              </li>
+              <li data-type="article">
+                <cite><a href="https://doi.org/10.1016/j.jvolgeores.2021.107411">Rheological evolution of eruptible Basaltic-Andesite Magmas under dynamic conditions: The importance of plagioclase growth rates</a></cite>
+                <p>Vetere F.; <strong>Petrelli M.</strong>; Perugini D.; Haselbach S.; Morgavi D.; Pisello A.; Iezzi G.; Holtz F. <i>Journal of Volcanology and Geothermal Research</i>. doi:10.1016/j.jvolgeores.2021.107411</p>
+              </li>
+              <li data-type="article">
+                <cite><a href="https://doi.org/10.1038/s41598-020-79558-7">Shallow conduit dynamics fuel the unexpected paroxysms of Stromboli volcano during the summer 2019</a></cite>
+                <p>Viccaro M.; Cannata A.; Cannavò F.; De Rosa R.; Giuffrida M.; Nicotra E.; <strong>Petrelli M.</strong>; Sacco G. <i>Scientific Reports</i>. doi:10.1038/s41598-020-79558-7</p>
+              </li>
+              <li data-type="article">
+                <cite><a href="https://doi.org/10.1029/2021GC009739">Tephrochronology and Provenance of an Early Pleistocene (Calabrian) Tephra From IODP Expedition 374 Site U1524, Ross Sea (Antarctica)</a></cite>
+                <p>Di Roberto A.; Scateni B.; Di Vincenzo G.; <strong>Petrelli M.</strong>; Fisauli G.; Barker S.J.; Del Carlo P.; Colleoni F.; Kulhanek D.K.; McKay R.; De Santis L.; The I. <i>Geochemistry, Geophysics, Geosystems</i>. doi:10.1029/2021GC009739</p>
+              </li>
+              <li data-type="article">
+                <cite><a href="https://doi.org/10.1093/petrology/egab064">The Origin of Rhyolitic Magmas at Krafla Central Volcano (Iceland)</a></cite>
+                <p>Rooyakkers S.M.; Stix J.; Berlo K.; <strong>Petrelli M.</strong>; Hampton R.L.; Barker S.J.; Morgavi D. <i>Journal of Petrology</i>. doi:10.1093/petrology/egab064</p>
+              </li>
+              <li data-type="article">
+                <cite><a href="https://doi.org/10.1021/acsearthspacechem.1c00004">Trace Element Conundrum of Natural Quasicrystals</a></cite>
+                <p>Tommasini S.; Bindi L.; <strong>Petrelli M.</strong>; Asimow P.D.; Steinhardt P.J. <i>ACS Earth and Space Chemistry</i>. doi:10.1021/acsearthspacechem.1c00004</p>
+              </li>
+            </ol>
+          </section>
+          <section class="pub-year">
+            <h3>2020</h3>
+            <ol>
+              <li data-type="chapter">
+                <cite><a href="https://doi.org/10.1002/9781119521143.ch1">Rates and Timescales of Magma Transfer, Storage, Emplacement, and Eruption</a></cite>
+                <p><span class="pub-kind">Book chapter.</span> <strong>Petrelli M.</strong>; Zellmer G.F. <i>Geophysical Monograph Series 254, pp. 3–41</i>. doi:10.1002/9781119521143.ch1</p>
+              </li>
+              <li data-type="article">
+                <cite><a href="https://doi.org/10.3389/feart.2020.00018">A Data Driven Approach to Investigate the Chemical Variability of Clinopyroxenes From the 2014–2015 Holuhraun–Bárdarbunga Eruption (Iceland)</a></cite>
+                <p>Caricchi L.; <strong>Petrelli M.</strong>; Bali E.; Sheldrake T.; Pioli L.; Simpson G. <i>Frontiers in Earth Science</i>. doi:10.3389/feart.2020.00018</p>
+              </li>
+              <li data-type="article">
+                <cite><a href="https://doi.org/10.1002/9781119521143.ch6">Architecture of the Magmatic System in the Main Ethiopian Rift</a></cite>
+                <p>Nazzareni S.; Rossi S.; <strong>Petrelli M.</strong>; Caricchi L. <i>Dynamic Magma Evolution</i>. doi:10.1002/9781119521143.ch6</p>
+              </li>
+              <li data-type="article">
+                <cite><a href="https://doi.org/10.1016/j.jvolgeores.2020.106992">Evidence for an unknown explosive eruption of Mt. Etna volcano (Italy) during the Late Glacial</a></cite>
+                <p>Del Carlo P.; Smedile A.; <strong>Petrelli M.</strong>; Di Roberto A. <i>Journal of Volcanology and Geothermal Research</i>. doi:10.1016/j.jvolgeores.2020.106992</p>
+              </li>
+              <li data-type="article">
+                <cite><a href="https://doi.org/10.1111/bor.12446">Holocene tephra record of Lake Veliko jezero, Croatia: implications for the central Mediterranean tephrostratigraphy and sea level rise</a></cite>
+                <p>Razum I.; Miko S.; Ilijanić N.; <strong>Petrelli M.</strong>; Röhl U.; Hasan O.; Giaccio B. <i>Boreas</i>. doi:10.1111/bor.12446</p>
+              </li>
+              <li data-type="article">
+                <cite><a href="https://doi.org/10.1029/2020JB020130">Machine Learning Thermo-Barometry: Application to Clinopyroxene-Bearing Magmas</a></cite>
+                <p><strong>Petrelli M.</strong>; Caricchi L.; Perugini D. <i>Journal of Geophysical Research: Solid Earth</i>. doi:10.1029/2020JB020130</p>
+              </li>
+              <li data-type="article">
+                <cite><a href="https://doi.org/10.1007/s00410-020-01728-7">Magma water content of Pico Volcano (Azores Islands, Portugal): a clinopyroxene perspective</a></cite>
+                <p>Nazzareni S.; Barbarossa V.; Skogby H.; Zanon V.; <strong>Petrelli M.</strong> <i>Contributions to Mineralogy and Petrology</i>. doi:10.1007/s00410-020-01728-7</p>
+              </li>
+            </ol>
+          </section>
+          <section class="pub-year">
+            <h3>2019</h3>
+            <ol>
+              <li data-type="article">
+                <cite><a href="https://doi.org/10.1016/j.jafrearsci.2019.103521">A comparison between the sub-continental lithospheric mantle of Libya, Morocco and Cameroon: Evidences from structural data and trace element of mantle xenolith Cr-diopsides</a></cite>
+                <p>Lenaz D.; Princivalle F.; De Min A.; <strong>Petrelli M.</strong>; Caldeira R.; Marzoli A.; Mata J.; Perugini D.; Youbi N.; Boumehdi M.A.; Ahmadi Ben Said I.A. <i>Journal of African Earth Sciences</i>. doi:10.1016/j.jafrearsci.2019.103521</p>
+              </li>
+              <li data-type="article">
+                <cite><a href="https://doi.org/10.1016/j.lithos.2018.11.032">Deciphering textural and chemical zoning of K-feldspar megacrysts from Mt. Amiata Volcano (Southern Tuscany, Italy): Insights into the petrogenesis and abnormal crystal growth</a></cite>
+                <p>Landi P.; La Felice S.; <strong>Petrelli M.</strong>; Vezzoli L.M.; Principe C. <i>Lithos</i>. doi:10.1016/j.lithos.2018.11.032</p>
+              </li>
+              <li data-type="article">
+                <cite><a href="https://doi.org/10.1016/j.lithos.2018.10.036">Discovery of moissanite in a peralkaline syenite from the Azores Islands</a></cite>
+                <p>Nazzareni S.; Nestola F.; Zanon V.; Bindi L.; Scricciolo E.; <strong>Petrelli M.</strong>; Zanatta M.; Mariotto G.; Giuli G. <i>Lithos</i>. doi:10.1016/j.lithos.2018.10.036</p>
+              </li>
+              <li data-type="article">
+                <cite><a href="https://doi.org/10.1038/s41598-019-47188-3">First marine cryptotephra in Antarctica found in sediments of the western Ross Sea correlates with englacial tephras and climate records</a></cite>
+                <p>Di Roberto A.; Colizza E.; Del Carlo P.; <strong>Petrelli M.</strong>; Finocchiaro F.; Kuhn G. <i>Scientific Reports</i>. doi:10.1038/s41598-019-47188-3</p>
+              </li>
+              <li data-type="article">
+                <cite><a href="https://doi.org/10.1038/s41598-019-52755-9">Gradual and selective trace-element enrichment in slab-released fluids at sub-arc depths</a></cite>
+                <p>Ferrando S.; <strong>Petrelli M.</strong>; Frezzotti M.L. <i>Scientific Reports</i>. doi:10.1038/s41598-019-52755-9</p>
+              </li>
+              <li data-type="article">
+                <cite><a href="https://doi.org/10.3390/min9110682">HFSE-REE transfer mechanisms during metasomatism of a late Miocene peraluminous granite intruding a carbonate host (Campiglia Marittima, Tuscany)</a></cite>
+                <p>Paoli G.; Dini A.; <strong>Petrelli M.</strong>; Rocchi S. <i>Minerals</i>. doi:10.3390/min9110682</p>
+              </li>
+              <li data-type="article">
+                <cite><a href="https://doi.org/10.2138/am-2019-6997">Interdiffusion of major elements at 1 atmosphere between natural shoshonitic and rhyolitic melts</a></cite>
+                <p>González-García D.; Vetere F.; Behrens H.; <strong>Petrelli M.</strong>; Morgavi D.; Perugini D. <i>American Mineralogist</i>. doi:10.2138/am-2019-6997</p>
+              </li>
+              <li data-type="article">
+                <cite><a href="https://doi.org/10.1093/database/baz085">Large expert-curated database for benchmarking document similarity detection in biomedical literature search</a></cite>
+                <p>Brown P.; <strong>Petrelli M.</strong>; et al. <i>Database</i>. doi:10.1093/database/baz085</p>
+              </li>
+              <li data-type="article">
+                <cite><a href="https://doi.org/10.1111/maps.13400">MgAl2O4 spinels from Allende and NWA 763 carbonaceous chondrites: Structural refinement, cooling history, and trace element contents</a></cite>
+                <p>Lenaz D.; Lughi V.; Perugini D.; <strong>Petrelli M.</strong>; Turco G.; Schmitz B. <i>Meteoritics and Planetary Science</i>. doi:10.1111/maps.13400</p>
+              </li>
+              <li data-type="article">
+                <cite><a href="https://doi.org/10.1016/j.chemer.2019.05.002">New insights into mineralogy and geochemistry of allanite-bearing Mediterranean coastal sands from Northern Greece</a></cite>
+                <p>Tzifas I.T.; Papadopoulos A.; Misaelides P.; Godelitsas A.; Göttlicher J.; Tsikos H.; Gamaletsos P.N.; Luvizotto G.; Karydas A.G.; <strong>Petrelli M.</strong>; Noli F.; Kantarelou V.; Kontofakas A.; Hatzidimitriou A. <i>Chemie der Erde</i>. doi:10.1016/j.chemer.2019.05.002</p>
+              </li>
+              <li data-type="article">
+                <cite><a href="https://doi.org/10.1016/j.jvolgeores.2018.11.027">Olivine major and trace element compositions coupled with spinel chemistry to unravel the magmatic systems feeding monogenetic basaltic volcanoes</a></cite>
+                <p>Jankovics M.É.; Sági T.; Astbury R.L.; <strong>Petrelli M.</strong>; Kiss B.; Ubide T.; Németh K.; Ntaflos T.; Harangi S. <i>Journal of Volcanology and Geothermal Research</i>. doi:10.1016/j.jvolgeores.2018.11.027</p>
+              </li>
+              <li data-type="article">
+                <cite><a href="https://doi.org/10.1007/s00410-019-1545-y">Pre-eruptive conditions and triggering mechanism of the ~16 ka Santa Bárbara explosive eruption of Sete Cidades Volcano (São Miguel, Azores)</a></cite>
+                <p>Laeger K.; <strong>Petrelli M.</strong>; Morgavi D.; Lustrino M.; Pimentel A.; Paredes-Mariño J.; Astbury R.L.; Kueppers U.; Porreca M.; Perugini D. <i>Contributions to Mineralogy and Petrology</i>. doi:10.1007/s00410-019-1545-y</p>
+              </li>
+              <li data-type="article">
+                <cite><a href="https://doi.org/10.1016/j.lithos.2018.11.004">Role of magma mixing in the pre-eruptive dynamics of the Aeolian Islands volcanoes (Southern Tyrrhenian Sea, Italy)</a></cite>
+                <p>Rossi S.; <strong>Petrelli M.</strong>; Morgavi D.; Vetere F.P.; Almeev R.R.; Astbury R.L.; Perugini D. <i>Lithos</i>. doi:10.1016/j.lithos.2018.11.004</p>
+              </li>
+              <li data-type="article">
+                <cite><a href="https://doi.org/10.1002/jqs.3107">The San Gregorio Magno lacustrine basin (Campania, southern Italy): improved characterization of the tephrostratigraphic markers based on trace elements and isotopic data</a></cite>
+                <p>Petrosino P.; Arienzo I.; Mazzeo F.C.; Natale J.; <strong>Petrelli M.</strong>; Milia A.; Perugini D.; D′Antonio M. <i>Journal of Quaternary Science</i>. doi:10.1002/jqs.3107</p>
+              </li>
+              <li data-type="article">
+                <cite><a href="https://doi.org/10.1016/j.jvolgeores.2019.04.006">The unexpected explosive sub-Plinian eruption of Calbuco volcano (22–23 April 2015; southern Chile): Triggering mechanism implications</a></cite>
+                <p>Arzilli F.; Morgavi D.; <strong>Petrelli M.</strong>; Polacci M.; Burton M.; Di Genova D.; Spina L.; La Spina G.; Hartley M.E.; Romero J.E.; Fellowes J.; Diaz-Alvarado J.; Perugini D. <i>Journal of Volcanology and Geothermal Research</i>. doi:10.1016/j.jvolgeores.2019.04.006</p>
+              </li>
+              <li data-type="article">
+                <cite><a href="https://doi.org/10.1016/j.wasman.2019.06.021">Vitrification treatment of municipal solid waste bottom ash</a></cite>
+                <p>Stabile P.; Bello M.; <strong>Petrelli M.</strong>; Paris E.; Carroll M.R. <i>Waste Management</i>. doi:10.1016/j.wasman.2019.06.021</p>
+              </li>
+            </ol>
+          </section>
+          <section class="pub-year">
+            <h3>2018</h3>
+            <ol>
+              <li data-type="article">
+                <cite><a href="https://doi.org/10.1111/maps.13002">Chemical and mineralogical characterization of the Mineo (Sicily, Italy) pallasite: A unique sample</a></cite>
+                <p>Zucchini A.; <strong>Petrelli M.</strong>; Frondini F.; Petrone C.M.; Sassi P.; Di Michele A.; Palmerini S.; Trippella O.; Busso M. <i>Meteoritics and Planetary Science</i>. doi:10.1111/maps.13002</p>
+              </li>
+              <li data-type="article">
+                <cite><a href="https://doi.org/10.1002/jsfa.9030">Determination of changes in the concentration and distribution of elements within olive drupes (cv. Leccino) from Se biofortified plants, using laser ablation inductively coupled plasma mass spectrometry</a></cite>
+                <p>D'Amato R.; <strong>Petrelli M.</strong>; Proietti P.; Onofri A.; Regni L.; Perugini D.; Businelli D. <i>Journal of the Science of Food and Agriculture</i>. doi:10.1002/jsfa.9030</p>
+              </li>
+              <li data-type="article">
+                <cite><a href="https://doi.org/10.1016/j.gca.2018.05.003">Diffusive exchange of trace elements between alkaline melts: Implications for element fractionation and timescale estimations during magma mixing</a></cite>
+                <p>González-Garcia D.; <strong>Petrelli M.</strong>; Behrens H.; Vetere F.; Fischer L.A.; Morgavi D.; Perugini D. <i>Geochimica et Cosmochimica Acta</i>. doi:10.1016/j.gca.2018.05.003</p>
+              </li>
+              <li data-type="article">
+                <cite><a href="https://doi.org/10.1016/j.lithos.2018.08.003">Evidence of Permian magmatism in the Alpi Apuane metamorphic complex (Northern Apennines, Italy): New hints for the geological evolution of the basement of the Adria plate</a></cite>
+                <p>Vezzoni S.; Biagioni C.; D'Orazio M.; Pieruccioni D.; Galanti Y.; <strong>Petrelli M.</strong>; Molli G. <i>Lithos</i>. doi:10.1016/j.lithos.2018.08.003</p>
+              </li>
+              <li data-type="article">
+                <cite><a href="https://doi.org/10.1016/j.quascirev.2018.07.028">Late Glacial-Holocene tephra from southern Patagonia and Tierra del Fuego (Argentina, Chile): A complete textural and geochemical fingerprinting for distal correlations in the Southern Hemisphere</a></cite>
+                <p>Del Carlo P.; Di Roberto A.; D'Orazio M.; <strong>Petrelli M.</strong>; Angioletti A.; Zanchetta G.; Maggi V.; Daga R.; Nazzari M.; Rocchi S. <i>Quaternary Science Reviews</i>. doi:10.1016/j.quascirev.2018.07.028</p>
+              </li>
+              <li data-type="article">
+                <cite><a href="https://doi.org/10.1127/ejm/2018/0030-2701">Sulfur and REE zoning in apatite: The example of the Colli Albani magmatic system</a></cite>
+                <p>Fabbrizio A.; Gaeta M.; Carroll M.R.; <strong>Petrelli M.</strong> <i>European Journal of Mineralogy</i>. doi:10.1127/ejm/2018/0030-2701</p>
+              </li>
+              <li data-type="article">
+                <cite><a href="https://doi.org/10.1007/s00445-018-1200-x">Tephra and cryptotephra in a ~60,000-year-old lacustrine sequence from the Fucino basin: New insights into the major explosive events in Italy</a></cite>
+                <p>Roberto A.D.; Smedile A.; Del Carlo P.; De Martini P.M.; Iorio M.; <strong>Petrelli M.</strong>; Pantosti D.; Pinzi S.; Todrani A. <i>Bulletin of Volcanology</i>. doi:10.1007/s00445-018-1200-x</p>
+              </li>
+              <li data-type="article">
+                <cite><a href="https://doi.org/10.1016/j.talanta.2017.09.030">The characterization of natural gemstones using non-invasive FT-IR spectroscopy: New data on tourmalines</a></cite>
+                <p>Mercurio M.; Rossi M.; Izzo F.; Cappelletti P.; Germinario C.; Grifa C.; <strong>Petrelli M.</strong>; Vergara A.; Langella A. <i>Talanta</i>. doi:10.1016/j.talanta.2017.09.030</p>
+              </li>
+              <li data-type="article">
+                <cite><a href="https://doi.org/10.1016/j.chemgeo.2018.07.035">The effect of diffusive re-equilibration time on trace element partitioning between alkali feldspar and trachytic melts</a></cite>
+                <p>Arzilli F.; Fabbrizio A.; Schmidt M.W.; <strong>Petrelli M.</strong>; Maimaiti M.; Dingwell D.B.; Paris E.; Burton M.; Carroll M.R. <i>Chemical Geology</i>. doi:10.1016/j.chemgeo.2018.07.035</p>
+              </li>
+              <li data-type="article">
+                <cite><a href="https://doi.org/10.1038/s41467-018-02987-6">Timescales of water accumulation in magmas and implications for short warning times of explosive eruptions</a></cite>
+                <p><strong>Petrelli M.</strong>; El Omari K.; Spina L.; Le Guer Y.; La Spina G.; Perugini D. <i>Nature Communications</i>. doi:10.1038/s41467-018-02987-6</p>
+              </li>
+              <li data-type="article">
+                <cite><a href="https://doi.org/10.1016/j.lithos.2018.08.033">Tracking plumbing system dynamics at the Campi Flegrei caldera, Italy: High-resolution trace element mapping of the Astroni crystal cargo</a></cite>
+                <p>Astbury R.L.; <strong>Petrelli M.</strong>; Ubide T.; Stock M.J.; Arienzo I.; D'Antonio M.; Perugini D. <i>Lithos</i>. doi:10.1016/j.lithos.2018.08.033</p>
+              </li>
+              <li data-type="article">
+                <cite><a href="https://doi.org/10.1016/j.gca.2017.05.030">s-Processing from MHD-induced mixing and isotopic abundances in presolar SiC grains</a></cite>
+                <p>Palmerini S.; Trippella O.; Busso M.; Vescovi D.; <strong>Petrelli M.</strong>; Zucchini A.; Frondini F. <i>Geochimica et Cosmochimica Acta</i>. doi:10.1016/j.gca.2017.05.030</p>
+              </li>
+            </ol>
+          </section>
+          <section class="pub-year">
+            <h3>2017</h3>
+            <ol>
+              <li data-type="article">
+                <cite><a href="https://doi.org/10.1016/j.quageo.2016.12.003">Combining machine learning techniques, microanalyses and large geochemical datasets for tephrochronological studies in complex volcanic areas: New age constraints for the Pleistocene magmatism of central Italy</a></cite>
+                <p><strong>Petrelli M.</strong>; Bizzarri R.; Morgavi D.; Baldanza A.; Perugini D. <i>Quaternary Geochronology</i>. doi:10.1016/j.quageo.2016.12.003</p>
+              </li>
+              <li data-type="article">
+                <cite><a href="https://doi.org/10.1038/s41598-017-17098-3">Enhancement of eruption explosivity by heterogeneous bubble nucleation triggered by magma mingling</a></cite>
+                <p>Paredes-Mariño J.; Dobson K.J.; Ortenzi G.; Kueppers U.; Morgavi D.; <strong>Petrelli M.</strong>; Hess K.-U.; Laeger K.; Porreca M.; Pimentel A.; Perugini D. <i>Scientific Reports</i>. doi:10.1038/s41598-017-17098-3</p>
+              </li>
+              <li data-type="article">
+                <cite><a href="https://doi.org/10.1002/2016JE005181">Experimental constraints on the rheology, eruption, and emplacement dynamics of analog lavas comparable to Mercury's northern volcanic plains</a></cite>
+                <p>Vetere F.; Rossi S.; Namur O.; Morgavi D.; Misiti V.; Mancinelli P.; <strong>Petrelli M.</strong>; Pauselli C.; Perugini D. <i>Journal of Geophysical Research: Planets</i>. doi:10.1002/2016JE005181</p>
+              </li>
+              <li data-type="article">
+                <cite><a href="https://doi.org/10.1016/j.lithos.2017.06.022">Exponential decay of concentration variance during magma mixing: Robustness of a volcanic chronometer and implications for the homogenization of chemical heterogeneities in magmatic systems</a></cite>
+                <p>Rossi S.; <strong>Petrelli M.</strong>; Morgavi D.; González-García D.; Fischer L.A.; Vetere F.; Perugini D. <i>Lithos</i>. doi:10.1016/j.lithos.2017.06.022</p>
+              </li>
+              <li data-type="article">
+                <cite><a href="https://doi.org/10.2138/am-2017-5860">High-resolution geochemistry of volcanic ash highlights complex magma dynamics during the Eyjafjallajökull 2010 eruption</a></cite>
+                <p>Laeger K.; <strong>Petrelli M.</strong>; Andronico D.; Misiti V.; Scarlato P.; Cimarelli C.; Taddeucci J.; Del Bello E.; Perugini D. <i>American Mineralogist</i>. doi:10.2138/am-2017-5860</p>
+              </li>
+              <li data-type="article">
+                <cite><a href="https://doi.org/10.1016/j.jvolgeores.2017.02.004">New proximal tephras at Somma-Vesuvius: evidences of a pre-caldera, large (?) explosive eruption</a></cite>
+                <p>Sparice D.; Scarpati C.; Mazzeo F.C.; Petrosino P.; Arienzo I.; Gisbert G.; <strong>Petrelli M.</strong> <i>Journal of Volcanology and Geothermal Research</i>. doi:10.1016/j.jvolgeores.2017.02.004</p>
+              </li>
+              <li data-type="article">
+                <cite><a href="https://doi.org/10.1016/j.lithos.2017.02.012">Restitic or not? Insights from trace element content and crystal-structure of spinels in African mantle xenoliths</a></cite>
+                <p>Lenaz D.; Musco M.E.; <strong>Petrelli M.</strong>; Caldeira R.; De Min A.; Marzoli A.; Mata J.; Perugini D.; Princivalle F.; Boumehdi M.A.; Bensaid I.A.A.; Youbi N. <i>Lithos</i>. doi:10.1016/j.lithos.2017.02.012</p>
+              </li>
+              <li data-type="article">
+                <cite><a href="https://doi.org/10.1016/j.lithos.2017.09.024">Titanite-bearing calc-silicate rocks constrain timing, duration and magnitude of metamorphic CO2 degassing in the Himalayan belt</a></cite>
+                <p>Rapa G.; Groppo C.; Rolfo F.; <strong>Petrelli M.</strong>; Mosca P.; Perugini D. <i>Lithos</i>. doi:10.1016/j.lithos.2017.09.024</p>
+              </li>
+              <li data-type="article">
+                <cite><a href="https://doi.org/10.1016/j.chemgeo.2017.05.023">Water-enhanced interdiffusion of major elements between natural shoshonite and high-K rhyolite melts</a></cite>
+                <p>González-García D.; Behrens H.; <strong>Petrelli M.</strong>; Vetere F.; Morgavi D.; Zhang C.; Perugini D. <i>Chemical Geology</i>. doi:10.1016/j.chemgeo.2017.05.023</p>
+              </li>
+            </ol>
+          </section>
+          <section class="pub-year">
+            <h3>2016</h3>
+            <ol>
+              <li data-type="article">
+                <cite><a href="https://doi.org/10.1016/j.chemgeo.2016.09.022">Combined Sr-Nd isotopic and geochemical fingerprinting as a tool for identifying tephra layers: Application to deep-sea cores from Eastern Mediterranean Sea</a></cite>
+                <p>D'Antonio M.; Mariconte R.; Arienzo I.; Mazzeo F.C.; Carandente A.; Perugini D.; <strong>Petrelli M.</strong>; Corselli C.; Orsi G.; Principato M.S.; Civetta L. <i>Chemical Geology</i>. doi:10.1016/j.chemgeo.2016.09.022</p>
+              </li>
+              <li data-type="article">
+                <cite><a href="https://doi.org/10.1002/2015GC006109">Effects of chaotic advection on the timescales of cooling and crystallization of magma bodies at mid crustal levels</a></cite>
+                <p><strong>Petrelli M.</strong>; El Omari K.; Le Guer Y.; Perugini D. <i>Geochemistry, Geophysics, Geosystems</i>. doi:10.1002/2015GC006109</p>
+              </li>
+              <li data-type="article">
+                <cite><a href="https://doi.org/10.1088/1742-6596/703/1/012027">Effects of the s-process on Fe-group elements in meteorites</a></cite>
+                <p>Trippella O.; Busso M.; Wasserburg G.J.; Palmerini S.; Frondini F.; <strong>Petrelli M.</strong>; Zucchini A. <i>Journal of Physics: Conference Series</i>. doi:10.1088/1742-6596/703/1/012027</p>
+              </li>
+              <li data-type="article">
+                <cite><a href="https://doi.org/10.2451/2015PM0465">Elemental imaging and petro-volcanological applications of an improved Laser Ablation Inductively Coupled Quadrupole Plasma Mass Spectrometry</a></cite>
+                <p><strong>Petrelli M.</strong>; Morgavi D.; Vetere F.; Perugini D. <i>Periodico di Mineralogia</i>. doi:10.2451/2015PM0465</p>
+              </li>
+              <li data-type="article">
+                <cite><a href="https://doi.org/10.1007/s12303-016-0007-z">High spatial resolution trace element determination of geological samples by laser ablation quadrupole plasma mass spectrometry: implications for glass analysis in volcanic products</a></cite>
+                <p><strong>Petrelli M.</strong>; Laeger K.; Perugini D. <i>Geosciences Journal</i>. doi:10.1007/s12303-016-0007-z</p>
+              </li>
+              <li data-type="article">
+                <cite><a href="https://doi.org/10.1007/s00410-016-1292-2">Solving petrological problems through machine learning: the study case of tectonic discrimination using geochemical and isotopic data</a></cite>
+                <p><strong>Petrelli M.</strong>; Perugini D. <i>Contributions to Mineralogy and Petrology</i>. doi:10.1007/s00410-016-1292-2</p>
+              </li>
+            </ol>
+          </section>
+          <section class="pub-year">
+            <h3>2015</h3>
+            <ol>
+              <li data-type="article">
+                <cite><a href="https://doi.org/10.1038/srep14225">Concentration variance decay during magma mixing: A volcanic chronometer</a></cite>
+                <p>Perugini D.; De Campos C.P.; <strong>Petrelli M.</strong>; Dingwell D.B. <i>Scientific Reports</i>. doi:10.1038/srep14225</p>
+              </li>
+              <li data-type="article">
+                <cite><a href="https://doi.org/10.1007/s00024-014-1029-y">Cooling of a Magmatic System Under Thermal Chaotic Mixing</a></cite>
+                <p>El Omari K.; Le Guer Y.; Perugini D.; <strong>Petrelli M.</strong> <i>Pure and Applied Geophysics</i>. doi:10.1007/s00024-014-1029-y</p>
+              </li>
+              <li data-type="article">
+                <cite><a href="https://doi.org/10.1016/j.jvolgeores.2015.09.024">Dynamics and time evolution of a shallow plumbing system: The 1739 and 1888-90 eruptions, Vulcano Island, Italy</a></cite>
+                <p>Vetere F.; <strong>Petrelli M.</strong>; Morgavi D.; Perugini D. <i>Journal of Volcanology and Geothermal Research</i>. doi:10.1016/j.jvolgeores.2015.09.024</p>
+              </li>
+              <li data-type="article">
+                <cite><a href="https://doi.org/10.1063/1.4932610">High-temperature apparatus for chaotic mixing of natural silicate melts</a></cite>
+                <p>Morgavi D.; <strong>Petrelli M.</strong>; Vetere F.P.; González-García D.; Perugini D. <i>Review of Scientific Instruments</i>. doi:10.1063/1.4932610</p>
+              </li>
+              <li data-type="article">
+                <cite><a href="https://doi.org/10.1016/j.lithos.2015.09.008">Quantifying magma mixing with the Shannon entropy: Application to simulations and experiments</a></cite>
+                <p>Perugini D.; De Campos C.P.; <strong>Petrelli M.</strong>; Morgavi D.; Vetere F.P.; Dingwell D.B. <i>Lithos</i>. doi:10.1016/j.lithos.2015.09.008</p>
+              </li>
+              <li data-type="article">
+                <cite><a href="https://doi.org/10.1016/j.lithos.2015.06.006">Time-space focused intrusion of genetically unrelated arc magmas in the early Paleozoic Ross-Delamerian Orogen (Morozumi Range, Antarctica)</a></cite>
+                <p>Rocchi S.; Di Vincenzo G.; Dini A.; <strong>Petrelli M.</strong>; Vezzoni S. <i>Lithos</i>. doi:10.1016/j.lithos.2015.06.006</p>
+              </li>
+            </ol>
+          </section>
+          <section class="pub-year">
+            <h3>2011</h3>
+            <ol>
+              <li data-type="article">
+                <cite><a href="https://doi.org/10.1016/j.lithos.2011.02.007">Transition to chaos and implications for time-scales of magma hybridization during mixing processes in magma chambers</a></cite>
+                <p><strong>Petrelli M.</strong>; Perugini D.; Poli G. <i>Lithos</i>. doi:10.1016/j.lithos.2011.02.007</p>
+              </li>
+            </ol>
+          </section>
+          <section class="pub-year">
+            <h3>2010</h3>
+            <ol>
+              <li data-type="article">
+                <cite><a href="https://doi.org/10.1016/j.gca.2010.02.007">Chlorine-rich metasomatic H2O-CO2 fluids in amphibole-bearing peridotites from Injibara (Lake Tana region, Ethiopian plateau): Nature and evolution of volatiles in the mantle of a region of continental flood basalts</a></cite>
+                <p>Frezzotti M.L.; Ferrando S.; Peccerillo A.; <strong>Petrelli M.</strong>; Tecce F.; Perucchi A. <i>Geochimica et Cosmochimica Acta</i>. doi:10.1016/j.gca.2010.02.007</p>
+              </li>
+              <li data-type="article">
+                <cite>Early Pleistocene distal pyroclastic-fallout material in continental and marine deposits of western Umbria (Italy): Chemical composition, provenance and correlation potential</cite>
+                <p>Bizzarri R.; Baldanza A.; <strong>Petrelli M.</strong>; Famiani F.; Peccerillo A. <i>Alpine and Mediterranean Quaternary</i></p>
+              </li>
+              <li data-type="article">
+                <cite><a href="https://doi.org/10.1007/s00445-009-0329-z">Time-scales of recent Phlegrean Fields eruptions inferred from the application of a ‘diffusive fractionation’ model of trace elements</a></cite>
+                <p>Perugini D.; Poli G.; <strong>Petrelli M.</strong>; de Campos C.P.; Dingwell D.B. <i>Bulletin of Volcanology</i>. doi:10.1007/s00445-009-0329-z</p>
+              </li>
+            </ol>
+          </section>
+          <section class="pub-year">
+            <h3>2009</h3>
+            <ol>
+              <li data-type="article">
+                <cite><a href="https://doi.org/10.1111/j.1365-3121.2009.00868.x">Accretion of juvenile crust at the Early Palaeozoic Antarctic margin of Gondwana: Geochemical and geochronological evidence from granulite xenoliths</a></cite>
+                <p>Gemelli M.; Rocchi S.; Di Vincenzo G.; <strong>Petrelli M.</strong> <i>Terra Nova</i>. doi:10.1111/j.1365-3121.2009.00868.x</p>
+              </li>
+              <li data-type="article">
+                <cite><a href="https://doi.org/10.1029/2008GC002176">Constraining the recent plumbing system of Vulcano (Aeolian Arc, Italy) by textural, petrological, and fractal analysis: The 1739 A.D. Pietre Cotte lava flow</a></cite>
+                <p>Piochi M.; De Astis G.; <strong>Petrelli M.</strong>; Ventura G.; Sulpizio R.; Zanetti A. <i>Geochemistry, Geophysics, Geosystems</i>. doi:10.1029/2008GC002176</p>
+              </li>
+              <li data-type="article">
+                <cite><a href="https://doi.org/10.1111/j.1525-1314.2009.00837.x">Metasomatism of continental crust during subduction: The UHP whiteschists from the Southern Dora-Maira Massif (Italian Western Alps)</a></cite>
+                <p>Ferrando S.; Frezzotti M.L.; <strong>Petrelli M.</strong>; Compagnoni R. <i>Journal of Metamorphic Geology</i>. doi:10.1111/j.1525-1314.2009.00837.x</p>
+              </li>
+            </ol>
+          </section>
+          <section class="pub-year">
+            <h3>2008</h3>
+            <ol>
+              <li data-type="article">
+                <cite><a href="https://doi.org/10.1007/s10069-006-0004-x">A virtual voyage through 3D structures generated by chaotic mixing of magmas and numerical simulations: A new approach for understanding spatial and temporal complexity of magma dynamics</a></cite>
+                <p>Perugini D.; <strong>Petrelli M.</strong>; Poli G. <i>Visual Geosciences</i>. doi:10.1007/s10069-006-0004-x</p>
+              </li>
+              <li data-type="article">
+                <cite><a href="https://doi.org/10.1007/s00604-007-0919-4">Combined cathodoluminescence spectroscopy, electron microprobe and laser ablation ICP mass spectrometry analysis: An attempt to correlate luminescence and chemical composition of monazite</a></cite>
+                <p>Vaggelli G.; Cossio R.; <strong>Petrelli M.</strong>; Rossetti P. <i>Microchimica Acta</i>. doi:10.1007/s00604-007-0919-4</p>
+              </li>
+              <li data-type="article">
+                <cite><a href="https://doi.org/10.1111/j.1751-908X.2008.00866.x">Micro-analytical zircon and monazite U-Pb isotope dating by laser ablation-inductively coupled plasma-quadrupole mass spectrometry</a></cite>
+                <p>Alagna K.E.; <strong>Petrelli M.</strong>; Perugini D.; Poli G. <i>Geostandards and Geoanalytical Research</i>. doi:10.1111/j.1751-908X.2008.00866.x</p>
+              </li>
+              <li data-type="article">
+                <cite><a href="https://doi.org/10.1127/0935-1221/2008/0020-1832">Origin and evolution of the Pleistocene magmatism of Linosa Island (Sicily channel, Italy)</a></cite>
+                <p>Di Bella M.; Russo S.; <strong>Petrelli M.</strong>; Peccerillo A. <i>European Journal of Mineralogy</i>. doi:10.1127/0935-1221/2008/0020-1832</p>
+              </li>
+              <li data-type="article">
+                <cite><a href="https://doi.org/10.2451/2008PM0001">Spatially resolved and bulk trace element analysis by laser ablation - Inductively coupled plasma - Mass spectrometry (LA-ICP-MS)</a></cite>
+                <p><strong>Petrelli M.</strong>; Perugini D.; Alagna K.E.; Poli G.; Peccerillo A. <i>Periodico di Mineralogia</i>. doi:10.2451/2008PM0001</p>
+              </li>
+              <li data-type="article">
+                <cite><a href="https://doi.org/10.1016/j.chemgeo.2008.06.032">Trace element mobility during magma mixing: Preliminary experimental results</a></cite>
+                <p>Perugini D.; De Campos C.P.; Dingwell D.B.; <strong>Petrelli M.</strong>; Poli G. <i>Chemical Geology</i>. doi:10.1016/j.chemgeo.2008.06.032</p>
+              </li>
+            </ol>
+          </section>
+          <section class="pub-year">
+            <h3>2007</h3>
+            <ol>
+              <li data-type="article">
+                <cite><a href="https://doi.org/10.1111/j.1751-908X.2007.00825.x">Application of high spatial resolution laser ablation ICP-MS to crystal-melt trace element partition coefficient determination</a></cite>
+                <p><strong>Petrelli M.</strong>; Caricchi L.; Ulmer P. <i>Geostandards and Geoanalytical Research</i>. doi:10.1111/j.1751-908X.2007.00825.x</p>
+              </li>
+              <li data-type="article">
+                <cite><a href="https://doi.org/10.1007/s00604-006-0731-6">Graphite electrode lithium tetraborate fusion for trace element determination in bulk geological samples by laser ablation ICP-MS</a></cite>
+                <p><strong>Petrelli M.</strong>; Perugini D.; Poli G.; Peccerillo A. <i>Microchimica Acta</i>. doi:10.1007/s00604-006-0731-6</p>
+              </li>
+              <li data-type="article">
+                <cite><a href="https://doi.org/10.1007/s00710-006-0173-1">Influence of landscape morphology and vegetation cover on the sampling of mixed plutonic bodies</a></cite>
+                <p>Perugini D.; <strong>Petrelli M.</strong>; Poli G. <i>Mineralogy and Petrology</i>. doi:10.1007/s00710-006-0173-1</p>
+              </li>
+            </ol>
+          </section>
+          <section class="pub-year">
+            <h3>2006</h3>
+            <ol>
+              <li data-type="article">
+                <cite><a href="https://doi.org/10.1016/j.physa.2006.02.023">Analysis of concentration patterns in volcanic rocks: Insights into dynamics of highly explosive volcanic eruptions</a></cite>
+                <p>Perugini D.; <strong>Petrelli M.</strong>; Poli G. <i>Physica A: Statistical Mechanics and its Applications</i>. doi:10.1016/j.physa.2006.02.023</p>
+              </li>
+              <li data-type="article">
+                <cite><a href="https://doi.org/10.1016/j.epsl.2006.01.026">Diffusive fractionation of trace elements by chaotic mixing of magmas</a></cite>
+                <p>Perugini D.; <strong>Petrelli M.</strong>; Poli G. <i>Earth and Planetary Science Letters</i>. doi:10.1016/j.epsl.2006.01.026</p>
+              </li>
+              <li data-type="article">
+                <cite><a href="https://doi.org/10.1007/s00604-006-0561-6">Micro-PIXE analysis of monazite from the Dora Maira massif, western Italian Alps</a></cite>
+                <p>Vaggelli G.; Borghi A.; Cossio R.; Fedi M.; Giuntini L.; Lombardo B.; Marino A.; Massi M.; Olmi F.; <strong>Petrelli M.</strong> <i>Microchimica Acta</i>. doi:10.1007/s00604-006-0561-6</p>
+              </li>
+              <li data-type="article">
+                <cite>Petrological and dynamical significance of plagioclase zoning in vegetation island felsic rocks (Terra Nova Intrusive Complex, Antarctica)</cite>
+                <p>Perugini D.; <strong>Petrelli M.</strong>; Poli G. <i>Terra Antartica Reports</i></p>
+              </li>
+              <li data-type="article">
+                <cite><a href="https://doi.org/10.1007/s00445-005-0007-8">Time-scales of hybridisation of magmatic enclaves in regular and chaotic flow fields: Petrologic and volcanologic implications</a></cite>
+                <p><strong>Petrelli M.</strong>; Perugini D.; Poli G. <i>Bulletin of Volcanology</i>. doi:10.1007/s00445-005-0007-8</p>
+              </li>
+            </ol>
+          </section>
+          <section class="pub-year">
+            <h3>2005</h3>
+            <ol>
+              <li data-type="article">
+                <cite><a href="https://doi.org/10.1029/2005GC000932">PetroGraph: A new software to visualize, model, and present geochemical data in igneous petrology</a></cite>
+                <p><strong>Petrelli M.</strong>; Poli G.; Perugini D.; Peccerillo A. <i>Geochemistry, Geophysics, Geosystems</i>. doi:10.1029/2005GC000932</p>
+              </li>
+            </ol>
+          </section>
+          <section class="pub-year">
+            <h3>2004</h3>
+            <ol>
+              <li data-type="article">
+                <cite><a href="https://doi.org/10.1016/j.epsl.2004.03.038">Kinematic significance of morphological structures generated by mixing of magmas: A case study from Salina Island (southern Italy)</a></cite>
+                <p>Perugini D.; Ventura G.; <strong>Petrelli M.</strong>; Poli G. <i>Earth and Planetary Science Letters</i>. doi:10.1016/j.epsl.2004.03.038</p>
+              </li>
+              <li data-type="article">
+                <cite>Travertine, a building stone extensively employed in Umbria from Etruscan to Renaissance age: Provenance determination using artificial intelligence technique</cite>
+                <p><strong>Petrelli M.</strong>; Perugini D.; Moroni B.; Poli G. <i>Periodico di Mineralogia</i></p>
+              </li>
+            </ol>
+          </section>
+          <section class="pub-year">
+            <h3>2003</h3>
+            <ol>
+              <li data-type="article">
+                <cite><a href="https://doi.org/10.1080/713827251">Determination of travertine provenance from ancient buildings using self-organizing maps and fuzzy logic</a></cite>
+                <p><strong>Petrelli M.</strong>; Perugini D.; Moroni B.; Poli G. <i>Applied Artificial Intelligence</i>. doi:10.1080/713827251</p>
+              </li>
+            </ol>
+          </section>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- CONTACT ====================================================== -->
+  <section class="section dark" id="contact" aria-labelledby="contact-title">
+    <div class="wrap section-grid">
+      <h2 id="contact-title">Contact</h2>
+      <div>
+        <p class="intro">I am always open to new collaborations worldwide. Write to me to discuss new ideas or propose a collaboration.</p>
+        <div class="contact-grid">
+          <address>
+            Maurizio Petrelli, PhD<br>
+            Department of Physics and Geology<br>
+            University of Perugia<br>
+            Piazza dell’Università<br>
+            06123 Perugia, Italy
+          </address>
+          <dl class="contact-lines">
+            <dt>Email</dt>
+            <dd><a href="mailto:maurizio.petrelli@unipg.it">maurizio.petrelli@unipg.it</a></dd>
+            <dt>Phone</dt>
+            <dd><a href="tel:+390755852607">+39 075 585 2607</a></dd>
+          </dl>
+          <ul class="link-list">
+            <li><a href="https://drive.google.com/file/d/1OS3iTMRsJzJ3qXv5L_IJeB5BliThfrfC/view?usp=drive_link">Download my CV</a></li>
+            <li><a href="https://www.scopus.com/authid/detail.uri?authorId=56962729500">Scopus profile</a></li>
+            <li><a href="https://github.com/petrelli-m">GitHub</a></li>
+            <li><a href="https://realise-dn.eu/">REALISE Doctoral Network</a></li>
+          </ul>
+        </div>
+      </div>
+    </div>
+  </section>
+
+</main>
+
+<!-- FOOTER ========================================================= -->
+<footer class="site-footer dark">
+  <div class="wrap">
+    <p>© 2026 Maurizio Petrelli, University of Perugia</p>
+    <p>Last updated November 2026</p>
+  </div>
+</footer>
+
+</body>
+</html>
