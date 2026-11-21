@@ -740,10 +740,12 @@ function createCrystalMap(canvas, readout, defaultReadout, spotData, mapData) {
   const groups = Array.from(list.querySelectorAll('.pub-year'));
   const items = Array.from(list.querySelectorAll('li'));
 
-  // Searchable text for each item, including its year
+  // Searchable text for each item, including its year; accents and
+  // curly apostrophes are ignored, so "agreda" finds "Ágreda"
+  const fold = s => s.normalize('NFD').replace(/[\u0300-\u036f]/g, '').replace(/[\u2018\u2019]/g, "'").toLowerCase();
   const text = new Map(items.map(li => {
     const year = li.closest('.pub-year').querySelector('h3').textContent;
-    return [li, `${year} ${li.textContent}`.replace(/\s+/g, ' ').toLowerCase()];
+    return [li, fold(`${year} ${li.textContent}`.replace(/\s+/g, ' '))];
   }));
 
   let filter = 'all';
@@ -762,7 +764,7 @@ function createCrystalMap(canvas, readout, defaultReadout, spotData, mapData) {
   input.addEventListener('input', update);
 
   function update() {
-    const terms = input.value.toLowerCase().split(/\s+/).filter(Boolean);
+    const terms = fold(input.value).split(/\s+/).filter(Boolean);
     let shown = 0;
 
     items.forEach(li => {

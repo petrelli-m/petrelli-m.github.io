@@ -23,6 +23,14 @@
   --margin-col: 12.5rem;
   --measure: 40rem;
 
+  /* Type scale: about 1.2 between steps, around an 18 px text size */
+  --fs-meta: 0.8125rem;    /* 13 px: captions, dates, authors, footer */
+  --fs-ui: 0.9375rem;      /* 15 px: navigation, links, buttons, tables */
+  --fs-body: 1.125rem;     /* 18 px: running text and titles in lists */
+  --fs-h3: 1.3125rem;      /* 21 px: headings inside sections, hero text */
+  --fs-title: 1.625rem;    /* 26 px: book and project titles, years */
+  --fs-h2: 2rem;           /* 32 px: section headings */
+
   /* Pumice: light pages */
   --paper: #F4F4F1;
   --paper-2: #E8E8E3;
@@ -77,9 +85,28 @@ body {
   background: var(--paper);
   color: var(--ink);
   font-family: var(--serif);
-  font-size: 1.125rem;
+  font-size: var(--fs-body);
   line-height: 1.62;
-  font-variant-numeric: oldstyle-nums;
+  font-kerning: normal;
+  font-variant-ligatures: common-ligatures contextual;
+  font-variant-numeric: oldstyle-nums proportional-nums;
+  text-rendering: optimizeLegibility;
+}
+
+/* Light text on basalt looks heavier than dark text on pumice */
+.dark {
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+/* Even line lengths: balanced headings, and no single word left alone
+   on the last line of a paragraph */
+h1, h2, h3, h4 {
+  text-wrap: balance;
+}
+
+p, li, dd {
+  text-wrap: pretty;
 }
 
 h1, h2, h3, p, ol, ul, dl, dd, figure {
@@ -103,12 +130,14 @@ img {
 
 a {
   color: var(--link);
+  text-decoration-color: color-mix(in srgb, currentColor 40%, transparent);
   text-decoration-thickness: 1px;
-  text-underline-offset: 0.18em;
+  text-underline-offset: 0.22em;
 }
 
 a:hover {
   color: var(--ink);
+  text-decoration-color: currentColor;
 }
 
 :focus-visible {
@@ -140,7 +169,7 @@ a:hover {
   background: var(--ink);
   color: var(--paper);
   font-family: var(--sans);
-  font-size: 0.875rem;
+  font-size: var(--fs-ui);
 }
 
 .skip-link:focus {
@@ -167,7 +196,7 @@ a:hover {
 .brand,
 .brand:hover {
   color: var(--ink);
-  font-size: 1.125rem;
+  font-size: var(--fs-body);
   font-weight: 500;
   text-decoration: none;
   white-space: nowrap;
@@ -180,7 +209,7 @@ a:hover {
   overflow-x: auto;
   scrollbar-width: none;
   font-family: var(--sans);
-  font-size: 0.875rem;
+  font-size: var(--fs-ui);
 }
 
 .nav-links a {
@@ -243,16 +272,17 @@ a:hover {
 .hero-role {
   margin-top: 1.4rem;
   color: var(--muted);
-  font-family: var(--sans);
-  font-size: 1.0625rem;
-  font-weight: 500;
-  line-height: 1.45;
+  font-family: var(--serif);
+  font-size: var(--fs-h3);
+  font-weight: 300;
+  line-height: 1.4;
+  font-style: italic;
 }
 
 .hero-lead {
   max-width: 31rem;
   margin-top: 1.4rem;
-  font-size: 1.25rem;
+  font-size: var(--fs-h3);
   line-height: 1.55;
 }
 
@@ -269,7 +299,7 @@ a:hover {
   border: 1px solid var(--ink);
   border-radius: 3px;
   font-family: var(--sans);
-  font-size: 0.9375rem;
+  font-size: var(--fs-ui);
   font-weight: 500;
   line-height: 1.2;
   text-decoration: none;
@@ -307,7 +337,7 @@ a:hover {
   margin-top: 0.75rem;
   color: var(--muted);
   font-family: var(--sans);
-  font-size: 0.8125rem;
+  font-size: var(--fs-meta);
   line-height: 1.5;
 }
 
@@ -361,10 +391,10 @@ a:hover {
   position: sticky;
   top: 5.5rem;
   align-self: start;
-  font-size: 1.875rem;
-  font-weight: 400;
-  line-height: 1.15;
-  letter-spacing: -0.01em;
+  font-size: var(--fs-h2);
+  font-weight: 300;
+  line-height: 1.1;
+  letter-spacing: -0.015em;
 }
 
 @media (max-width: 860px) {
@@ -397,21 +427,22 @@ a:hover {
 }
 
 h3 {
-  font-size: 1.375rem;
-  font-weight: 500;
+  font-size: var(--fs-h3);
+  font-weight: 400;
   line-height: 1.3;
   letter-spacing: -0.005em;
 }
 
 .content > .sub {
   margin-top: 3rem;
-  font-size: 1.125rem;
+  font-size: var(--fs-body);
+  font-weight: 500;
 }
 
 .note {
   color: var(--muted);
   font-family: var(--sans);
-  font-size: 0.9375rem;
+  font-size: var(--fs-ui);
   line-height: 1.55;
 }
 
@@ -448,7 +479,7 @@ h3 {
   margin-top: 0.5rem;
   color: var(--muted);
   font-family: var(--sans);
-  font-size: 0.8125rem;
+  font-size: var(--fs-meta);
 }
 
 @media (max-width: 760px) {
@@ -458,13 +489,9 @@ h3 {
   }
 }
 
-.now-grid h3 {
-  font-size: 1.25rem;
-}
-
 .now-grid p {
   margin-top: 0.6rem;
-  font-size: 1.0625rem;
+  font-size: var(--fs-body);
 }
 
 .links {
@@ -473,7 +500,7 @@ h3 {
   gap: 0.4rem 1.2rem;
   margin-top: 0.9rem;
   font-family: var(--sans);
-  font-size: 0.9375rem;
+  font-size: var(--fs-ui);
 }
 
 
@@ -512,7 +539,7 @@ h3 {
   background: var(--paper-2);
   color: var(--muted);
   font-family: var(--sans);
-  font-size: 0.875rem;
+  font-size: var(--fs-ui);
   text-align: center;
 }
 
@@ -522,7 +549,7 @@ h3 {
 
 .facts {
   font-family: var(--sans);
-  font-size: 0.9375rem;
+  font-size: var(--fs-ui);
   line-height: 1.5;
 }
 
@@ -577,7 +604,7 @@ summary {
   width: fit-content;
   color: var(--link);
   font-family: var(--sans);
-  font-size: 0.9375rem;
+  font-size: var(--fs-ui);
   font-weight: 500;
   cursor: pointer;
 }
@@ -589,7 +616,7 @@ summary:hover {
 .refs {
   margin-top: 0.9rem;
   font-family: var(--sans);
-  font-size: 0.9rem;
+  font-size: var(--fs-ui);
   line-height: 1.5;
 }
 
@@ -600,7 +627,7 @@ summary:hover {
 
 .refs i {
   font-family: var(--serif);
-  font-size: 1rem;
+  font-size: 1.07em;
 }
 
 .students {
@@ -617,7 +644,7 @@ summary:hover {
 .students span {
   color: var(--muted);
   font-family: var(--sans);
-  font-size: 0.9375rem;
+  font-size: var(--fs-ui);
 }
 
 .grants {
@@ -639,11 +666,11 @@ summary:hover {
 .grant .years {
   padding-top: 0.15rem;
   color: var(--muted);
-  font-size: 0.9375rem;
+  font-size: var(--fs-ui);
 }
 
 .grant h3 {
-  font-size: 1.125rem;
+  font-size: var(--fs-body);
   line-height: 1.4;
 }
 
@@ -655,21 +682,22 @@ summary:hover {
   margin-top: 0.35rem;
   color: var(--muted);
   font-family: var(--sans);
-  font-size: 0.875rem;
+  font-size: var(--fs-meta);
   line-height: 1.5;
 }
 
 .grant .amount {
   padding-top: 0.15rem;
-  font-size: 0.9375rem;
+  font-size: var(--fs-ui);
   line-height: 1.45;
   text-align: right;
+  font-variant-numeric: lining-nums proportional-nums;
 }
 
 .amount small {
   display: block;
   color: var(--muted);
-  font-size: 0.8125rem;
+  font-size: var(--fs-meta);
 }
 
 @media (max-width: 680px) {
@@ -698,13 +726,10 @@ summary:hover {
 }
 
 .project h3 {
-  font-size: 1.875rem;
-  font-weight: 500;
+  font-size: var(--fs-title);
+  font-weight: 400;
   line-height: 1.15;
-}
-
-.project .subtitle {
-  font-size: 1.0625rem;
+  letter-spacing: -0.01em;
 }
 
 .project > p {
@@ -741,22 +766,23 @@ summary:hover {
 .book-year {
   padding-top: 0.2rem;
   color: var(--muted);
-  font-size: 2.25rem;
+  font-size: var(--fs-h2);
   font-weight: 300;
   font-variant-numeric: lining-nums;
   line-height: 1;
 }
 
 .book h3 {
-  font-size: 1.5rem;
+  font-size: var(--fs-title);
   line-height: 1.25;
+  letter-spacing: -0.01em;
 }
 
 .subtitle {
   display: block;
   margin-top: 0.25rem;
   color: var(--muted);
-  font-size: 1.125rem;
+  font-size: var(--fs-body);
   font-style: italic;
   font-weight: 400;
 }
@@ -768,7 +794,7 @@ summary:hover {
 .book .cite {
   color: var(--muted);
   font-family: var(--sans);
-  font-size: 0.875rem;
+  font-size: var(--fs-meta);
   line-height: 1.5;
 }
 
@@ -779,7 +805,7 @@ summary:hover {
   }
 
   .book-year {
-    font-size: 1.5rem;
+    font-size: var(--fs-title);
   }
 }
 
@@ -792,14 +818,14 @@ summary:hover {
   gap: 1.25rem;
   padding: 0.7rem 0;
   border-top: 1px solid var(--rule);
-  font-size: 1.0625rem;
+  font-size: var(--fs-body);
   line-height: 1.5;
 }
 
 .timeline .when {
   padding-top: 0.15rem;
   color: var(--muted);
-  font-size: 0.875rem;
+  font-size: var(--fs-meta);
 }
 
 .timeline .where {
@@ -807,7 +833,7 @@ summary:hover {
   margin-top: 0.15rem;
   color: var(--muted);
   font-family: var(--sans);
-  font-size: 0.875rem;
+  font-size: var(--fs-meta);
 }
 
 .content > h3 + .timeline {
@@ -866,7 +892,7 @@ summary:hover {
   background: transparent;
   color: var(--ink);
   font-family: var(--sans);
-  font-size: 0.875rem;
+  font-size: var(--fs-ui);
   cursor: pointer;
 }
 
@@ -890,7 +916,7 @@ summary:hover {
   margin-top: 1.25rem;
   color: var(--muted);
   font-family: var(--sans);
-  font-size: 0.875rem;
+  font-size: var(--fs-meta);
 }
 
 .pub-year {
@@ -903,11 +929,13 @@ summary:hover {
 }
 
 .pub-year h3 {
-  padding-top: 0.2rem;
-  font-family: var(--sans);
-  font-size: 0.9375rem;
-  font-weight: 600;
-  font-variant-numeric: lining-nums tabular-nums;
+  padding-top: 0.15rem;
+  font-family: var(--serif);
+  font-size: var(--fs-title);
+  font-weight: 300;
+  font-variant-numeric: lining-nums;
+  line-height: 1;
+  color: var(--muted);
 }
 
 .pub-year ol {
@@ -917,7 +945,7 @@ summary:hover {
 
 .pub-year cite {
   display: block;
-  font-size: 1.0625rem;
+  font-size: var(--fs-body);
   font-style: normal;
   line-height: 1.45;
 }
@@ -936,7 +964,7 @@ summary:hover {
   margin-top: 0.2rem;
   color: var(--muted);
   font-family: var(--sans);
-  font-size: 0.8125rem;
+  font-size: var(--fs-meta);
   line-height: 1.5;
 }
 
@@ -971,13 +999,13 @@ address {
 .contact-lines,
 .link-list {
   font-family: var(--sans);
-  font-size: 1rem;
-  line-height: 1.9;
+  font-size: var(--fs-ui);
+  line-height: 1.8;
 }
 
 .contact-lines dt {
   color: var(--muted);
-  font-size: 0.8125rem;
+  font-size: var(--fs-meta);
   line-height: 1.4;
 }
 
@@ -990,7 +1018,7 @@ address {
   border-top: 1px solid var(--rule);
   color: var(--muted);
   font-family: var(--sans);
-  font-size: 0.8125rem;
+  font-size: var(--fs-meta);
 }
 
 .site-footer .wrap {

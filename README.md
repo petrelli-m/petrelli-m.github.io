@@ -23,6 +23,8 @@ Plain HTML, CSS and JavaScript. No framework, no build step.
 - **Dark bands:** add `dark` to a section's class, e.g. `<section class="section dark" id="books">`.
   Remove it to make the section light again. Funding and Contact are dark by default.
 - **Colours:** all in section 1 of `style.css` (light pumice values, then basalt values).
+- **Type sizes:** six steps, also in section 1 of `style.css` (`--fs-meta` to `--fs-h2`); change one
+  value there to resize every element that uses it.
 - **After editing `style.css`, `script.js`, a data file or a photo:** change the `?v=` value where
   `index.html` links to it (for example `style.css?v=20261121b` → `style.css?v=20261125`). Browsers
   keep copies for 10 minutes; a new value makes them fetch the new file at once.
