@@ -155,9 +155,10 @@ a:hover {
 .external-tail::after {
   content: "";
   display: inline-block;
-  width: 0.6em;
-  height: 0.6em;
-  margin-left: 0.28em;
+  width: 0.9em;
+  height: 0.9em;
+  margin-left: 0.3em;
+  vertical-align: -0.12em;
   background-color: currentColor;
   opacity: 0.75;
   -webkit-mask-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 12 12' fill='none' stroke='black' stroke-width='1.3' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M5 2.5H2.5v7h7V7'/%3E%3Cpath d='M7 1.75h3.25V5M10.25 1.75 5.5 6.5'/%3E%3C/svg%3E");
