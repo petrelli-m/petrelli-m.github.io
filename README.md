@@ -13,6 +13,7 @@ Plain HTML, CSS and JavaScript. No framework, no build step.
 | `favicon.svg` | Browser tab icon                                                 |
 | `portrait.jpg`| Portrait in the About section (4:5)                              |
 | `lecture.jpg` | Full-width photo between Now and About                           |
+| `CNAME`       | The custom domain for GitHub Pages: www.mauriziopetrelli.info    |
 
 ## Editing
 
@@ -45,9 +46,8 @@ Plain HTML, CSS and JavaScript. No framework, no build step.
 1. Create a public repository named `petrelli-m.github.io`.
 2. Upload these files and folders, keeping `data/` and `tools/` as folders.
 3. Settings → Pages → Build and deployment → Deploy from a branch → `main`, `/ (root)` → Save.
-4. When the DNS is ready to switch: Settings → Pages → Custom domain:
-   `www.mauriziopetrelli.info` → Save. GitHub adds a `CNAME` file with that name;
-   keep it in the repository from then on.
+4. The `CNAME` file sets the custom domain, `www.mauriziopetrelli.info`
+   (shown in Settings → Pages → Custom domain). Keep it in the repository.
 5. At the DNS provider (Aruba), for `mauriziopetrelli.info`:
    - `@` A records: 185.199.108.153, 185.199.109.153, 185.199.110.153, 185.199.111.153
      (remove the old A record)
