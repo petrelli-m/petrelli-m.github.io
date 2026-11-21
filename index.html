@@ -3,6 +3,8 @@
   Maurizio Petrelli: personal website
   Files: index.html (all content), style.css (layout and colours), script.js (diagram and search)
   Dark bands: add class "dark" to any <section class="section"> (REALISE, Funding and Contact have it).
+  After changing style.css, script.js, a data file or a photo, change the ?v= value in its link
+  below, so browsers fetch the new file instead of a cached copy.
 -->
 <html lang="en">
 <head>
@@ -20,10 +22,10 @@
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Schibsted+Grotesk:wght@400;500;600&amp;family=Spectral:ital,wght@0,300;0,400;0,500;1,300;1,400&amp;display=swap">
-  <link rel="stylesheet" href="style.css">
-  <script src="data/cpx-spots.js" defer></script>
-  <script src="data/cpx-map.js" defer></script>
-  <script src="script.js" defer></script>
+  <link rel="stylesheet" href="style.css?v=20261121b">
+  <script src="data/cpx-spots.js?v=20261121b" defer></script>
+  <script src="data/cpx-map.js?v=20261121b" defer></script>
+  <script src="script.js?v=20261121b" defer></script>
 
   <script type="application/ld+json">
   {
@@ -98,7 +100,7 @@
       <div class="now-grid">
         <article class="now-feature">
           <figure class="now-photo">
-            <img src="lecture.jpg" alt="Maurizio Petrelli on stage beside a large screen reading “Machine Learning in Petrology and Volcanology”, Department of Physics and Geology, University of Perugia" width="1280" height="813">
+            <img src="lecture.jpg?v=20261121b" alt="Maurizio Petrelli on stage beside a large screen reading “Machine Learning in Petrology and Volcanology”, Department of Physics and Geology, University of Perugia" width="1280" height="813">
             <figcaption>Lecturing on machine learning in petrology and volcanology.</figcaption>
           </figure>
           <div>

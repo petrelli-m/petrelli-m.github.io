@@ -23,6 +23,9 @@ Plain HTML, CSS and JavaScript. No framework, no build step.
 - **Dark bands:** add `dark` to a section's class, e.g. `<section class="section dark" id="books">`.
   Remove it to make the section light again. Funding and Contact are dark by default.
 - **Colours:** all in section 1 of `style.css` (light pumice values, then basalt values).
+- **After editing `style.css`, `script.js`, a data file or a photo:** change the `?v=` value where
+  `index.html` links to it (for example `style.css?v=20261121b` → `style.css?v=20261125`). Browsers
+  keep copies for 10 minutes; a new value makes them fetch the new file at once.
 - **Hero figure:** the crystal map plays once when the page opens (not at all for visitors who ask
   their system to reduce motion).
   The figure uses the data of Caracciolo et al. (2026), Nature Communications,
