@@ -422,9 +422,39 @@ h3 {
 /* Now */
 .now-grid {
   display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(15rem, 1fr));
-  gap: 2.25rem 2.5rem;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 2.5rem;
   max-width: 60rem;
+}
+
+/* First item: the lecture photograph beside its text */
+.now-feature {
+  grid-column: 1 / -1;
+  display: grid;
+  grid-template-columns: minmax(0, 1.15fr) minmax(0, 1fr);
+  gap: 1.5rem 2.5rem;
+  align-items: center;
+}
+
+.now-photo img {
+  display: block;
+  width: 100%;
+  height: auto;
+  border-radius: 2px;
+}
+
+.now-photo figcaption {
+  margin-top: 0.5rem;
+  color: var(--muted);
+  font-family: var(--sans);
+  font-size: 0.8125rem;
+}
+
+@media (max-width: 760px) {
+  .now-grid,
+  .now-feature {
+    grid-template-columns: minmax(0, 1fr);
+  }
 }
 
 .now-grid h3 {
@@ -447,32 +477,6 @@ h3 {
 
 
 /* 7. ABOUT: large portrait beside the biography ------------------- */
-
-/* Photo band: a full-width photograph between sections */
-.photo-band img {
-  display: block;
-  width: 100%;
-  max-width: 100rem;
-  height: auto;
-  margin: 0 auto;
-  aspect-ratio: 12 / 5;           /* keeps the screen title and the full figure in view */
-  object-fit: cover;
-  object-position: 30% 100%;
-}
-
-@media (max-width: 600px) {
-  .photo-band img {
-    aspect-ratio: auto;           /* the whole photograph on phones */
-  }
-}
-
-.photo-band figcaption {
-  padding-top: 0.75rem;
-  padding-bottom: 0.85rem;
-  color: var(--muted);
-  font-family: var(--sans);
-  font-size: 0.8125rem;
-}
 
 /* The text wraps around the portrait */
 .about {

@@ -12,7 +12,7 @@ Plain HTML, CSS and JavaScript. No framework, no build step.
 | `tools/build_data.py` | Rebuilds the two data files from the paper's repository        |
 | `favicon.svg` | Browser tab icon                                                 |
 | `portrait.jpg`| Portrait in the About section (4:5)                              |
-| `lecture.jpg` | Full-width photo between Now and About                           |
+| `lecture.jpg` | Lecture photo beside the first item in Now                       |
 | `CNAME`       | The custom domain for GitHub Pages: www.mauriziopetrelli.info    |
 
 ## Editing
