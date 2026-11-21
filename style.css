@@ -494,13 +494,46 @@ h3 {
   font-size: var(--fs-body);
 }
 
-/* Latest news from the project websites, listed by script.js */
+/* Latest news from the project websites, listed by script.js on the
+   same two columns as the items above: date, title, then the project */
 .now-news {
   grid-column: 1 / -1;
 }
 
-.now-news .timeline {
+.news-list {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 0 2.5rem;
   margin-top: 1rem;
+}
+
+.news-list li {
+  padding: 0.85rem 0 1.1rem;
+  border-top: 1px solid var(--rule);
+  font-size: var(--fs-body);
+  line-height: 1.45;
+}
+
+.news-list time,
+.news-list .project {
+  display: block;
+  color: var(--muted);
+  font-family: var(--sans);
+  font-size: var(--fs-meta);
+}
+
+.news-list time {
+  margin-bottom: 0.3rem;
+}
+
+.news-list .project {
+  margin-top: 0.3rem;
+}
+
+@media (max-width: 760px) {
+  .news-list {
+    grid-template-columns: minmax(0, 1fr);
+  }
 }
 
 .links {

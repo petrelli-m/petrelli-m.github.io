@@ -840,23 +840,20 @@ function createCrystalMap(canvas, readout, defaultReadout, spotData, mapData) {
     const [year, month, day] = item.date.split('-').map(Number);
 
     const time = document.createElement('time');
+    time.className = 'num';
     time.dateTime = item.date;
     time.textContent = `${day} ${MONTHS[month - 1]} ${year}`;
-    const when = document.createElement('span');
-    when.className = 'when num';
-    when.append(time);
 
     const link = document.createElement('a');
     link.href = item.url;
     link.textContent = item.title;
-    const where = document.createElement('span');
-    where.className = 'where';
-    where.textContent = item.project;
-    const what = document.createElement('span');
-    what.append(link, ' ', where);
+
+    const project = document.createElement('span');
+    project.className = 'project';
+    project.textContent = item.project;
 
     const li = document.createElement('li');
-    li.append(when, ' ', what);
+    li.append(time, link, project);
     list.append(li);
   });
 
