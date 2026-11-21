@@ -169,6 +169,14 @@ a:hover {
   mask-size: contain;
 }
 
+/* Smaller in the publication titles, where the type is larger */
+.pub-year cite .external-tail::after {
+  width: 0.6em;
+  height: 0.6em;
+  margin-left: 0.28em;
+  vertical-align: 0;
+}
+
 :focus-visible {
   outline: 2px solid var(--link);
   outline-offset: 3px;
