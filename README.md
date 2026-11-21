@@ -6,6 +6,7 @@ Plain HTML, CSS and JavaScript. No framework, no build step.
 |---------------|------------------------------------------------------------------|
 | `index.html`  | All the text: every section, every publication                   |
 | `style.css`   | Layout and colours (basalt and pumice)                           |
+| `fonts.css`, `fonts/` | Spectral and Schibsted Grotesk, served from this site (see below) |
 | `script.js`   | Hero figure (crystal map), publication search, navigation        |
 | `data/cpx-spots.js` | La Palma clinopyroxene spots: trace elements, clusters, ML pressure and temperature |
 | `data/cpx-map.js`   | Cr, Sc, Zr and cluster map of a Tajogaite 2021 crystal           |
@@ -25,7 +26,11 @@ Plain HTML, CSS and JavaScript. No framework, no build step.
 - **Colours:** all in section 1 of `style.css` (light pumice values, then basalt values).
 - **Type sizes:** six steps, also in section 1 of `style.css` (`--fs-meta` to `--fs-h2`); change one
   value there to resize every element that uses it.
-- **After editing `style.css`, `script.js`, a data file or a photo:** change the `?v=` value where
+- **Fonts:** Spectral (text and headings) and Schibsted Grotesk (navigation, labels, figure) are
+  in `fonts/` and declared in `fonts.css`, so the site loads nothing from Google or other third
+  parties. Both are under the SIL Open Font License 1.1 (`fonts/OFL-*.txt`, keep these files).
+  `--serif` and `--sans` in section 1 of `style.css` choose where each family is used.
+- **After editing `fonts.css`, `style.css`, `script.js`, a data file or a photo:** change the `?v=` value where
   `index.html` links to it (for example `style.css?v=20261121b` → `style.css?v=20261125`). Browsers
   keep copies for 10 minutes; a new value makes them fetch the new file at once.
 - **Hero figure:** the crystal map plays once when the page opens (not at all for visitors who ask
@@ -50,7 +55,7 @@ Plain HTML, CSS and JavaScript. No framework, no build step.
 ## Publishing on GitHub Pages
 
 1. Create a public repository named `petrelli-m.github.io`.
-2. Upload these files and folders, keeping `data/` and `tools/` as folders.
+2. Upload these files and folders, keeping `data/`, `fonts/` and `tools/` as folders.
 3. Settings → Pages → Build and deployment → Deploy from a branch → `main`, `/ (root)` → Save.
 4. The `CNAME` file sets the custom domain, `www.mauriziopetrelli.info`
    (shown in Settings → Pages → Custom domain). Keep it in the repository.
