@@ -8,6 +8,7 @@
    3. Publications: search and filter over the list in index.html
    4. Navigation: underline the section in view
    5. Portrait: show a hint if portrait.jpg is missing
+   6. Project news: the latest items of data/news.js, under Now
    ================================================================= */
 
 'use strict';
@@ -819,4 +820,45 @@ function createCrystalMap(canvas, readout, defaultReadout, spotData, mapData) {
   const markMissing = () => img.closest('.portrait').classList.add('is-missing');
   if (img.complete && img.naturalWidth === 0) markMissing();
   else img.addEventListener('error', markMissing);
+})();
+
+
+/* 6. PROJECT NEWS ---------------------------------------------------
+   Lists the newest items of data/news.js, which GitHub copies every
+   morning from the REALISE and REALI3SE websites. If the file is missing
+   or empty, the block stays hidden. */
+
+(function projectNews() {
+  const NEWS_SHOWN = 4;
+  const box = document.getElementById('project-news');
+  if (!box || typeof PROJECT_NEWS === 'undefined' || PROJECT_NEWS.length === 0) return;
+  const MONTHS = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
+  const list = box.querySelector('ul');
+
+  PROJECT_NEWS.slice(0, NEWS_SHOWN).forEach(item => {
+    if (!/^https:\/\//.test(item.url)) return;
+    const [year, month, day] = item.date.split('-').map(Number);
+
+    const time = document.createElement('time');
+    time.dateTime = item.date;
+    time.textContent = `${day} ${MONTHS[month - 1]} ${year}`;
+    const when = document.createElement('span');
+    when.className = 'when num';
+    when.append(time);
+
+    const link = document.createElement('a');
+    link.href = item.url;
+    link.textContent = item.title;
+    const where = document.createElement('span');
+    where.className = 'where';
+    where.textContent = item.project;
+    const what = document.createElement('span');
+    what.append(link, ' ', where);
+
+    const li = document.createElement('li');
+    li.append(when, ' ', what);
+    list.append(li);
+  });
+
+  box.hidden = list.children.length === 0;
 })();

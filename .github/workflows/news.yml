@@ -1,0 +1,34 @@
+# Project news: copies the latest news of realise-dn.eu and reali3se.eu
+# into data/news.js every morning, and commits only when something changed.
+# GitHub Pages then republishes the site by itself.
+# To run it now: Actions → Project news → Run workflow.
+name: Project news
+
+on:
+  schedule:
+    - cron: "23 4 * * *"   # every day at 04:23 UTC
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+concurrency: project-news
+
+jobs:
+  update:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v5
+      - name: Read the two feeds
+        run: python3 tools/fetch_news.py
+      - name: Commit the news if they changed
+        run: |
+          if git diff --quiet -- data/news.js; then
+            echo "No new items."
+          else
+            git config user.name "github-actions[bot]"
+            git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+            git add data/news.js
+            git commit -m "News: update from realise-dn.eu and reali3se.eu"
+            git push
+          fi

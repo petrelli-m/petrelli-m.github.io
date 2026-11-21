@@ -494,6 +494,15 @@ h3 {
   font-size: var(--fs-body);
 }
 
+/* Latest news from the project websites, listed by script.js */
+.now-news {
+  grid-column: 1 / -1;
+}
+
+.now-news .timeline {
+  margin-top: 1rem;
+}
+
 .links {
   display: flex;
   flex-wrap: wrap;

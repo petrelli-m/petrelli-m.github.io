@@ -11,6 +11,9 @@ Plain HTML, CSS and JavaScript. No framework, no build step.
 | `data/cpx-spots.js` | La Palma clinopyroxene spots: trace elements, clusters, ML pressure and temperature |
 | `data/cpx-map.js`   | Cr, Sc, Zr and cluster map of a Tajogaite 2021 crystal           |
 | `tools/build_data.py` | Rebuilds the two data files from the paper's repository        |
+| `data/news.js` | Latest news of realise-dn.eu and reali3se.eu, shown under Now (written automatically) |
+| `tools/fetch_news.py` | Reads the two websites' RSS feeds and rewrites `data/news.js` |
+| `.github/workflows/news.yml` | Runs `tools/fetch_news.py` on GitHub every morning |
 | `favicon.svg` | Browser tab icon                                                 |
 | `portrait.jpg`| Portrait in the About section (4:5)                              |
 | `lecture.jpg` | Lecture photo beside the first item in Now                       |
@@ -33,6 +36,13 @@ Plain HTML, CSS and JavaScript. No framework, no build step.
 - **After editing `fonts.css`, `style.css`, `script.js`, a data file or a photo:** change the `?v=` value where
   `index.html` links to it (for example `style.css?v=20261121b` → `style.css?v=20261125`). Browsers
   keep copies for 10 minutes; a new value makes them fetch the new file at once.
+- **Project news:** every morning GitHub runs `tools/fetch_news.py`, which reads the RSS feeds of
+  realise-dn.eu and reali3se.eu and rewrites `data/news.js`; when something is new it commits the
+  file and the site republishes itself. The page shows the four newest items (`NEWS_SHOWN` in
+  section 6 of `script.js`). To update at once: Actions → Project news → Run workflow. Do not edit
+  `data/news.js` by hand. Before editing locally, pull first (`git pull`), because GitHub may have
+  committed new news. GitHub pauses daily runs in a repository with no commits for 60 days and
+  sends an email; one click in the Actions tab turns them back on.
 - **Hero figure:** the crystal map plays once when the page opens (not at all for visitors who ask
   their system to reduce motion).
   The figure uses the data of Caracciolo et al. (2026), Nature Communications,

@@ -6,6 +6,7 @@
   Dark bands: add class "dark" to any <section class="section"> (REALISE, Funding and Contact have it).
   After changing fonts.css, style.css, script.js, a data file or a photo, change the ?v= value in its link
   below, so browsers fetch the new file instead of a cached copy.
+  data/news.js (project news) is rewritten every morning by GitHub and needs no ?v= value.
 -->
 <html lang="en">
 <head>
@@ -21,10 +22,11 @@
   <link rel="icon" href="favicon.svg" type="image/svg+xml">
 
   <link rel="stylesheet" href="fonts.css?v=20261121a">
-  <link rel="stylesheet" href="style.css?v=20261121e">
+  <link rel="stylesheet" href="style.css?v=20261121f">
   <script src="data/cpx-spots.js?v=20261121b" defer></script>
   <script src="data/cpx-map.js?v=20261121b" defer></script>
-  <script src="script.js?v=20261121e" defer></script>
+  <script src="data/news.js" defer></script>
+  <script src="script.js?v=20261121f" defer></script>
 
   <script type="application/ld+json">
   {
@@ -125,6 +127,12 @@
             <a href="https://reali3se.eu/">reali3se.eu</a>
           </p>
         </article>
+        <!-- Filled by script.js from data/news.js, which GitHub updates every morning
+             from the news of realise-dn.eu and reali3se.eu -->
+        <div class="now-news" id="project-news" hidden>
+          <h3>Latest from the project websites</h3>
+          <ul class="timeline"></ul>
+        </div>
       </div>
     </div>
   </section>
