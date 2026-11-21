@@ -9,6 +9,7 @@
    4. Navigation: underline the section in view
    5. Portrait: show a hint if portrait.jpg is missing
    6. Project news: the latest items of data/news.js, under Now
+   7. External links: open in a new tab, with an icon
    ================================================================= */
 
 'use strict';
@@ -858,4 +859,43 @@ function createCrystalMap(canvas, readout, defaultReadout, spotData, mapData) {
   });
 
   box.hidden = list.children.length === 0;
+})();
+
+
+/* 7. EXTERNAL LINKS -------------------------------------------------
+   Every link to another website opens in a new tab and gets a small icon
+   after its last word (".external-tail" in style.css). Screen readers
+   announce it with the note "Opens in a new tab" at the end of index.html.
+   Links within the page, email and phone links are left as they are.
+   Runs after section 6, so the project news links are included. */
+
+(function externalLinks() {
+  const note = document.getElementById('new-tab-note');
+
+  // Wrap the last word of the link's text, so the icon stays beside it
+  function addIcon(link) {
+    const walker = document.createTreeWalker(link, NodeFilter.SHOW_TEXT);
+    let last = null;
+    while (walker.nextNode()) {
+      if (walker.currentNode.textContent.trim()) last = walker.currentNode;
+    }
+    if (!last) return;
+    const text = last.textContent.replace(/\s+$/, '');
+    const cut = text.search(/\S+$/);
+    const tail = document.createElement('span');
+    tail.className = 'external-tail';
+    tail.textContent = text.slice(cut);
+    if (tail.textContent.length > 30) tail.classList.add('long');  // e.g. a long DOI: let it wrap
+    last.textContent = text.slice(0, cut);
+    last.after(tail);
+  }
+
+  document.querySelectorAll('a[href]').forEach(link => {
+    if (!/^https?:$/.test(link.protocol) || link.hostname === location.hostname) return;
+    link.target = '_blank';
+    link.relList.add('noopener');
+    link.classList.add('external');
+    if (note) link.setAttribute('aria-describedby', note.id);
+    addIcon(link);
+  });
 })();
