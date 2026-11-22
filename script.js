@@ -96,6 +96,12 @@ function createCrystalMap(canvas, readout, defaultReadout, spotData, mapData) {
   const W = mapData.width;
   const H = mapData.height;
   const ELEMENTS = ['Cr', 'Sc', 'Zr'];
+  // Shown in the periodic-table tile at the top right of the map
+  const ELEMENT_TILE = {
+    Cr: { number: 24, name: 'Chromium' },
+    Sc: { number: 21, name: 'Scandium' },
+    Zr: { number: 40, name: 'Zirconium' }
+  };
 
   // What each cluster records, after the paper
   const CLUSTER_ABOUT = [
@@ -164,6 +170,14 @@ function createCrystalMap(canvas, readout, defaultReadout, spotData, mapData) {
     }
   }
   const pixelAt = new Map(pixels.map((p, n) => [p.j * W + p.i, n]));
+
+  // For the last c columns of the map, the first row with crystal in it:
+  // the element tile sits in this empty corner, clear of the crystal
+  const firstRowFromRight = [0];
+  for (let c = 1; c <= W; c++) {
+    const rows = pixels.filter(p => p.i >= W - c).map(p => p.j);
+    firstRowFromRight.push(rows.length ? Math.min(...rows) : H);
+  }
 
   /* --- Pressure, temperature and density estimates ---------------- */
 
@@ -396,12 +410,23 @@ function createCrystalMap(canvas, readout, defaultReadout, spotData, mapData) {
 
     // Title above the map
     const element = zrMix > 0.5 ? 'Zr' : scMix > 0.5 ? 'Sc' : 'Cr';
-    let title = narrow ? `${element} map` : `${element} map, Tajogaite 2021`;
+    let title = narrow ? 'LA-ICP-MS map' : 'LA-ICP-MS map, Tajogaite 2021';
     if (clustering) title = narrow ? 'Clusters' : 'Clusters, Tajogaite 2021';
     ctx.font = `500 ${fontSize + 1}px ${colours.sans}`;
     ctx.textAlign = 'left';
+    ctx.textBaseline = 'bottom';
     ctx.fillStyle = rgba(colours.ink, 1);
     ctx.fillText(title, map.x, map.y - 8);
+
+    // Element shown, as in the periodic table; fades out when clustering starts
+    const tileAlpha = easeOut(clamp01(t / 600)) * (1 - assigned(t));
+    if (tileAlpha > 0) {
+      drawElementTile(tileAlpha, [
+        ['Cr', 1 - scMix],
+        ['Sc', scMix * (1 - zrMix)],
+        ['Zr', zrMix]
+      ]);
+    }
 
     // Under the map: colour scale, then cluster key
     const keyY = map.y + map.h + (narrow ? 12 : 16);
@@ -444,6 +469,55 @@ function createCrystalMap(canvas, readout, defaultReadout, spotData, mapData) {
       ctx.lineWidth = 1.5;
       ctx.strokeRect(map.x + p.i * cell - 1, map.y + p.j * cell - 1, cell + 2, cell + 2);
     }
+  }
+
+  // Rounded square with atomic number, symbol and name, at the top right
+  // of the map; while the map changes element, the old and new cross-fade
+  function drawElementTile(alpha, shown) {
+    const { map } = layout;
+    const cell = map.w / W;
+    let size = Math.round(Math.min(48, Math.max(30, map.w * 0.185)));
+    const clearBelow = map.y + firstRowFromRight[Math.min(W, Math.ceil(size / cell))] * cell - 3;
+    size = Math.max(26, Math.min(size, clearBelow));
+    const x = map.x + map.w - size;
+    const y = Math.max(0, clearBelow - size);
+    const radius = size * 0.14;
+
+    ctx.beginPath();
+    ctx.moveTo(x + radius, y);
+    ctx.arcTo(x + size, y, x + size, y + size, radius);
+    ctx.arcTo(x + size, y + size, x, y + size, radius);
+    ctx.arcTo(x, y + size, x, y, radius);
+    ctx.arcTo(x, y, x + size, y, radius);
+    ctx.closePath();
+    ctx.fillStyle = rgba(colours.paper, 0.92 * alpha);
+    ctx.fill();
+    ctx.strokeStyle = rgba(colours.ink, 0.7 * alpha);
+    ctx.lineWidth = 1;
+    ctx.stroke();
+
+    const withName = size >= 40;
+    shown.forEach(([symbol, weight]) => {
+      if (weight <= 0) return;
+      const a = alpha * weight;
+      const { number, name } = ELEMENT_TILE[symbol];
+      ctx.fillStyle = rgba(colours.muted, a);
+      ctx.font = `400 ${Math.round(size * 0.19)}px ${colours.sans}`;
+      ctx.textAlign = 'left';
+      ctx.textBaseline = 'top';
+      ctx.fillText(String(number), x + size * 0.11, y + size * 0.09);
+      ctx.fillStyle = rgba(colours.ink, a);
+      ctx.font = `600 ${Math.round(size * 0.42)}px ${colours.sans}`;
+      ctx.textAlign = 'center';
+      ctx.textBaseline = 'middle';
+      ctx.fillText(symbol, x + size / 2, y + size * (withName ? 0.54 : 0.6));
+      if (withName) {
+        ctx.fillStyle = rgba(colours.muted, a);
+        ctx.font = `400 ${Math.round(size * 0.155)}px ${colours.sans}`;
+        ctx.textBaseline = 'alphabetic';
+        ctx.fillText(name, x + size / 2, y + size * 0.9);
+      }
+    });
   }
 
   function drawPlot(t, fontSize, focus) {
