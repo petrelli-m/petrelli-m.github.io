@@ -347,11 +347,13 @@ function createCrystalMap(canvas, readout, defaultReadout, spotData, mapData) {
   /* --- Timeline (ms) ---------------------------------------------- */
 
   const T_SCAN = 2000;              // laser maps the crystal, Cr first
-  const T_SC = [2300, 2700];        // colour scale changes to Sc
-  const T_ZR = [2900, 3300];        // then to Zr
-  const T_ASSIGN = 3600;            // all pixels fade to their cluster colour together
+  const MAP_HOLD = 1800;            // each element map stays this long, in full
+  const MAP_FADE = 800;             // cross-fade from one element map to the next
+  const T_SC = [T_SCAN + MAP_HOLD, T_SCAN + MAP_HOLD + MAP_FADE];          // to Sc
+  const T_ZR = [T_SC[1] + MAP_HOLD, T_SC[1] + MAP_HOLD + MAP_FADE];        // then to Zr
+  const T_ASSIGN = T_ZR[1] + MAP_HOLD;  // all pixels fade to their cluster colour together
   const ASSIGN_SPAN = 900;
-  const T_STEPS = 5300;             // clusters appear in the plot, core to rim
+  const T_STEPS = T_ASSIGN + 1700;  // clusters appear in the plot, core to rim
   const STEP_SPAN = 1300;
   const T_ALL = T_STEPS + STEPS.length * STEP_SPAN;
   const T_END = T_ALL + 500;
