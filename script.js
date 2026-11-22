@@ -340,6 +340,7 @@ function createCrystalMap(canvas, readout, defaultReadout, spotData, mapData) {
       map: { x: 0, y: top, w: mapW, h: mapH },
       plot: { x: mapW + gap, y: top, w: Math.max(10, width - mapW - gap - right), h: Math.max(10, mapH - (narrow ? 22 : 28)) }
     };
+    reserveReadoutSpace();
     draw(now);
   }
 
@@ -733,9 +734,39 @@ function createCrystalMap(canvas, readout, defaultReadout, spotData, mapData) {
     `Cluster ${c.k}, ${CLUSTER_ABOUT[c.k]}: ${c.n} spots, centroid ${c.pMean.toFixed(1)} kbar ` +
     `(${Math.round(c.depthMean)} km) and ${Math.round(c.tMean)} °C`;
 
+  const describePixel = p =>
+    `Tajogaite 2021 crystal: Cr ${ppm(p.ppm[0])} ppm, Sc ${ppm(p.ppm[1])} ppm, ` +
+    `Zr ${ppm(p.ppm[2])} ppm, cluster ${p.cluster}, ${CLUSTER_ABOUT[p.cluster]}`;
+
   const describeSpot = s =>
     `${[s.eruption, s.rock, s.position].filter(Boolean).join(', ')}: ${s.p.toFixed(1)} kbar ` +
     `(${Math.round(s.depth)} km) and ${Math.round(s.t)} °C, cluster ${s.cluster}, ${CLUSTER_ABOUT[s.cluster]}`;
+
+  // Keep the caption the same height whatever it says: measure the longest
+  // texts at the current width and reserve their height, so the figure
+  // does not jump when the readout changes from one line to two
+  const longestReadouts = [
+    ...pixels.map(describePixel),
+    ...ptSpots.map(describeSpot),
+    ...clusters.map(describeCluster)
+  ].sort((a, b) => b.length - a.length).slice(0, 12);
+
+  function reserveReadoutSpace() {
+    const width = readout.clientWidth;
+    if (!width) return;
+    const probe = readout.cloneNode(false);
+    probe.removeAttribute('id');
+    probe.setAttribute('aria-hidden', 'true');
+    probe.style.cssText = `position: absolute; visibility: hidden; width: ${width}px; min-height: 0`;
+    readout.after(probe);
+    let tallest = 0;
+    [defaultReadout, ...longestReadouts].forEach(text => {
+      probe.textContent = text;
+      tallest = Math.max(tallest, probe.offsetHeight);
+    });
+    probe.remove();
+    readout.style.minHeight = `${tallest}px`;
+  }
 
   function showItem(event) {
     if (!done()) return;
@@ -752,8 +783,7 @@ function createCrystalMap(canvas, readout, defaultReadout, spotData, mapData) {
       if (n !== undefined) {
         const p = pixels[n];
         hover = { pixel: n, cluster: p.cluster };
-        readout.textContent = `Tajogaite 2021 crystal: Cr ${ppm(p.ppm[0])} ppm, Sc ${ppm(p.ppm[1])} ppm, ` +
-          `Zr ${ppm(p.ppm[2])} ppm, cluster ${p.cluster}, ${CLUSTER_ABOUT[p.cluster]}`;
+        readout.textContent = describePixel(p);
       }
     } else if (px >= plot.x && px <= plot.x + plot.w && py >= plot.y && py <= plot.y + plot.h) {
       const near = (x, y) => Math.hypot(x - px, y - py);

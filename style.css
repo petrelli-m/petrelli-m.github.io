@@ -378,8 +378,9 @@ a:hover {
   line-height: 1.5;
 }
 
+/* Two lines until script.js measures the exact height the readout needs */
 .figure-readout {
-  min-height: 1.5em;
+  min-height: 3em;
   color: var(--ink);
   font-weight: 500;
   font-variant-numeric: lining-nums;
