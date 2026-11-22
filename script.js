@@ -3,8 +3,9 @@
 
    No page text lives here: all content is in index.html.
    0. Shared helpers
-   1. Hero figure: starts the crystal map
+   1. Hero figures: the crystal map and the projects map, under two tabs
    2. Crystal map and the clusters in pressure–temperature space
+   2b. Projects map: REALISE and REALI3SE
    3. Publications: search and filter over the list in index.html
    4. Navigation: underline the section in view
    5. Portrait: show a hint if portrait.jpg is missing
@@ -60,17 +61,54 @@ function fitCanvas(canvas) {
 }
 
 
-/* 1. HERO FIGURE ----------------------------------------------------
-   Draws the crystal map once the page has painted, and plays it once. */
+/* 1. HERO FIGURES ---------------------------------------------------
+   Draws the crystal map once the page has painted and plays it once.
+   With the projects data loaded, shows the two tabs: choosing a tab
+   shows its figure and plays its animation. */
 
-(function heroFigure() {
-  const canvas = document.getElementById('crystal-map');
-  const readout = document.getElementById('figure-readout');
-  if (!canvas || !readout || typeof CPX_SPOTS === 'undefined' || typeof CPX_MAP === 'undefined') return;
+(function heroFigures() {
+  const crystal = { canvas: document.getElementById('crystal-map'), readout: document.getElementById('figure-readout') };
+  const projects = { canvas: document.getElementById('projects-map'), readout: document.getElementById('projects-readout') };
+  const tablist = document.querySelector('.figure-tabs');
+  const haveCrystal = crystal.canvas && crystal.readout && typeof CPX_SPOTS !== 'undefined' && typeof CPX_MAP !== 'undefined';
+  const haveProjects = projects.canvas && projects.readout && typeof PROJECTS !== 'undefined' && typeof LAND !== 'undefined';
 
   const fontsReady = document.fonts ? document.fonts.ready : Promise.resolve();
   fontsReady.then(() => requestAnimationFrame(() => setTimeout(() => {
-    createCrystalMap(canvas, readout, readout.textContent, CPX_SPOTS, CPX_MAP).start();
+    const figures = new Map();
+    if (haveCrystal) {
+      figures.set('tab-crystal', createCrystalMap(crystal.canvas, crystal.readout, crystal.readout.textContent, CPX_SPOTS, CPX_MAP));
+      figures.get('tab-crystal').start();
+    }
+    if (!haveCrystal || !haveProjects || !tablist) return;
+    figures.set('tab-projects', createProjectsMap(projects.canvas, projects.readout, projects.readout.textContent, PROJECTS, LAND));
+
+    // Tabs: click, or arrow keys, Home and End when a tab has focus.
+    // The chosen figure plays its animation; the other one stops.
+    const tabs = Array.from(tablist.querySelectorAll('[role="tab"]'));
+    function select(tab, moveFocus) {
+      tabs.forEach(t => {
+        const on = t === tab;
+        t.setAttribute('aria-selected', String(on));
+        t.tabIndex = on ? 0 : -1;
+        document.getElementById(t.getAttribute('aria-controls')).hidden = !on;
+        if (!on) figures.get(t.id).stop();
+      });
+      if (moveFocus) tab.focus();
+      figures.get(tab.id).start();
+    }
+    tabs.forEach((tab, i) => {
+      tab.addEventListener('click', () => {
+        if (tab.getAttribute('aria-selected') !== 'true') select(tab, false);
+      });
+      tab.addEventListener('keydown', event => {
+        const to = { ArrowRight: i + 1, ArrowLeft: i - 1, Home: 0, End: tabs.length - 1 }[event.key];
+        if (to === undefined) return;
+        event.preventDefault();
+        select(tabs[(to + tabs.length) % tabs.length], true);
+      });
+    });
+    tablist.hidden = false;
   }, 0)));
 })();
 
@@ -827,7 +865,614 @@ function createCrystalMap(canvas, readout, defaultReadout, spotData, mapData) {
   canvas.addEventListener('pointerleave', clearItem);
   new ResizeObserver(() => { if (!canvas.closest('[hidden]')) resize(); }).observe(canvas);
 
-  return { start };
+  return { start, stop: () => cancelAnimationFrame(frameId) };
+}
+
+
+/* 2b. PROJECTS MAP -------------------------------------------------
+   REALISE and REALI3SE: logos, titles, EU contributions and consortia.
+   The map opens on Europe and draws the REALISE network from Perugia,
+   then zooms out to draw REALI3SE and its partners in the Americas and
+   Africa. Filled dots are beneficiaries, rings associated partners; a
+   place in both projects is split, REALISE left and REALI3SE right.
+   Pointing at a place lists its organisations, pointing at a logo gives
+   the project. Data: data/projects.js (editable) and data/land.js. */
+
+function createProjectsMap(canvas, readout, defaultReadout, data, land) {
+  const ctx = canvas.getContext('2d');
+  const rad = d => (d * Math.PI) / 180;
+  const mercator = (lon, lat) => [rad(lon), Math.log(Math.tan(Math.PI / 4 + rad(lat) / 2))];
+  const ROLE_RANK = { coordinator: 3, beneficiary: 2, partner: 1 };
+
+  /* --- Projects and places ---------------------------------------- */
+
+  const projects = data.projects.map((p, n) => {
+    const image = new Image();
+    image.decoding = 'async';
+    image.src = p.logo;
+    image.addEventListener('load', () => draw(now));
+    const organisations = data.sites.flatMap(s => s.organisations
+      .filter(o => o[p.id]).map(o => ({ role: o[p.id], country: s.country })));
+    const years = p.period.match(/\d{4}/g);
+    return {
+      ...p, n, image,
+      rgb: hexToRgb(p.colour),
+      side: n === 0 ? 1 : -1,                                  // arcs bend one way per project
+      years: years ? `${years[0]}–${years[years.length - 1]}` : p.period,
+      beneficiaries: organisations.filter(o => o.role !== 'partner').length,
+      partners: organisations.filter(o => o.role === 'partner').length,
+      countries: new Set(organisations.map(o => o.country)).size
+    };
+  });
+
+  const sites = data.sites.map(s => {
+    const [x, y] = mercator(s.lon, s.lat);
+    const role = {};
+    projects.forEach(p => {
+      role[p.id] = s.organisations.map(o => o[p.id]).filter(Boolean)
+        .sort((a, b) => ROLE_RANK[b] - ROLE_RANK[a])[0] || null;
+    });
+    return { ...s, x, y, role };
+  });
+  const hub = sites.find(s => s.role[projects[0].id] === 'coordinator') || sites[0];
+
+  // Land dots: column indices of land in each row (data/land.js)
+  const landRows = land.rows.map(row => {
+    const cols = [];
+    let c = 0;
+    row.split(' ').filter(Boolean).map(Number).forEach((n, k) => {
+      if (k % 2) for (let i = 0; i < n; i++) cols.push(c + i);
+      c += n;
+    });
+    return cols;
+  });
+  const rowStep = (land.step * Math.sqrt(3)) / 2;
+
+  // Views: Europe for REALISE (places within 30° W–45° E), everything for REALI3SE
+  const box = list => list.reduce((b, s) => [
+    Math.min(b[0], s.x), Math.min(b[1], s.y), Math.max(b[2], s.x), Math.max(b[3], s.y)
+  ], [Infinity, Infinity, -Infinity, -Infinity]);
+  const europeBox = box(sites.filter(s => s.role[projects[0].id] && s.lon > -30 && s.lon < 45));
+  const worldBox = box(sites);
+
+
+  /* --- Timeline (ms) ---------------------------------------------- */
+
+  const T_LAND = 700;               // land fades in
+  const T_BLOCK = [200, 4900];      // each project's text block appears
+  const T_NET = [800, 5500];        // each project's arcs start
+  const NET_SPAN = [2400, 2600];
+  const T_ZOOM = [3400, 5300];      // Europe to world
+  const COUNT_SPAN = 1800;          // EU contribution counts up
+  const T_END = 8600;
+
+  // Arcs from the hub, nearest first; long arcs take longer
+  const arcs = projects.flatMap(p => {
+    const targets = sites.filter(s => s !== hub && s.role[p.id])
+      .map(s => ({ s, d: Math.hypot(s.x - hub.x, s.y - hub.y) }))
+      .sort((a, b) => a.d - b.d);
+    const span = NET_SPAN[p.n];
+    return targets.map(({ s, d }, k) => {
+      const duration = 420 + 700 * clamp01(d / 2);
+      const start = T_NET[p.n] + (targets.length > 1 ? k * (span - duration) / (targets.length - 1) : 0);
+      return { p, s, start: Math.max(T_NET[p.n], start), end: Math.max(T_NET[p.n], start) + duration };
+    });
+  });
+  const arrival = new Map(arcs.map(a => [`${a.p.id}|${a.s.place}`, a.end]));
+  const arrivedAt = (p, s, t) => clamp01((t - (s === hub ? T_NET[p.n] - 300
+    : arrival.get(`${p.id}|${s.place}`) ?? Infinity)) / 260);
+
+
+  /* --- Drawing ---------------------------------------------------- */
+
+  const landLayer = document.createElement('canvas');
+  const landCtx = landLayer.getContext('2d');
+  let landKey = '';
+
+  let size = { width: 0, height: 0, ratio: 1 };
+  let layout = null;
+  let colours = null;
+  let views = null;
+  let hover = null;
+  let frameId = 0;
+  let t0 = 0;
+  let now = Infinity;
+
+  function fit(b, rect, pad, maxScale) {
+    const scale = Math.min((rect.w - 2 * pad) / Math.max(b[2] - b[0], 1e-3),
+      (rect.h - 2 * pad) / Math.max(b[3] - b[1], 1e-3), maxScale);
+    return { cx: (b[0] + b[2]) / 2, cy: (b[1] + b[3]) / 2, scale };
+  }
+
+  const TITLE_SIZE = 13;            // project titles, desktop layout only
+  const TITLE_LINE = 16;
+
+  function wrap(text, maxWidth, maxLines) {
+    const lines = [];
+    let line = '';
+    text.split(' ').forEach(word => {
+      const next = line ? `${line} ${word}` : word;
+      if (ctx.measureText(next).width <= maxWidth || !line) line = next;
+      else { lines.push(line); line = word; }
+    });
+    if (line) lines.push(line);
+    return lines.length <= maxLines ? lines : null;
+  }
+
+  function resize() {
+    size = fitCanvas(canvas);
+    colours = themeColours(canvas);
+    const { width, height } = size;
+    const narrow = width < 480;
+    let map;
+    const blocks = [];
+
+    if (narrow) {
+      // Two columns above the map: logo, EU contribution, consortium
+      const colW = (width - 12) / 2;
+      const cardH = Math.round((colW - 12) / 3.9 + 12);
+      const rowH = cardH + 52;
+      projects.forEach(p => blocks.push({ x: p.n * (colW + 12), y: 0, w: colW, cardH, title: null }));
+      map = { x: 0, y: rowH + 6, w: width, h: Math.max(10, height - rowH - 6) };
+    } else {
+      // Info column on the left, map on the right
+      const infoW = Math.round(width * 0.36);
+      const cardH = Math.round((infoW - 16) / 3.9 + 16);
+      ctx.font = `italic 300 ${TITLE_SIZE}px ${colours.serif}`;
+      const titles = projects.map(p => wrap(p.title, infoW, 5));
+      // Block height: card, title lines, EU contribution and two lines of facts
+      const blockH = lines => cardH + (lines ? 10 + lines.length * TITLE_LINE : 0) + 26 + 8 + 42;
+      const fits = titles.every(Boolean) && blockH(titles[0]) + blockH(titles[1]) + 20 <= height - 28;
+      let y = 0;
+      projects.forEach(p => {
+        const title = fits ? titles[p.n] : null;
+        blocks.push({ x: 0, y, w: infoW, cardH, title });
+        y += blockH(title) + 20;
+      });
+      map = { x: infoW + 22, y: 0, w: width - infoW - 22, h: height };
+    }
+
+    layout = { narrow, map, blocks };
+    const pad = narrow ? 14 : 26;
+    views = {
+      europe: fit(europeBox, map, pad, map.w / rad(44)),
+      world: fit(worldBox, map, pad, Infinity)
+    };
+    landKey = '';
+    reserveReadoutSpace();
+    draw(now);
+  }
+
+  function viewAt(t) {
+    const k = clamp01((t - T_ZOOM[0]) / (T_ZOOM[1] - T_ZOOM[0]));
+    const e = k < 0.5 ? 4 * k * k * k : 1 - Math.pow(-2 * k + 2, 3) / 2;   // ease in and out
+    const a = views.europe;
+    const b = views.world;
+    return { cx: lerp(a.cx, b.cx, e), cy: lerp(a.cy, b.cy, e), scale: Math.exp(lerp(Math.log(a.scale), Math.log(b.scale), e)) };
+  }
+
+  const toScreen = (view, x, y) => [
+    layout.map.x + layout.map.w / 2 + (x - view.cx) * view.scale,
+    layout.map.y + layout.map.h / 2 - (y - view.cy) * view.scale
+  ];
+
+  // Land as dots, redrawn only when the view changes
+  function drawLand(view, alpha) {
+    const { width, height, ratio } = size;
+    const key = `${view.cx.toFixed(5)}|${view.cy.toFixed(5)}|${view.scale.toFixed(2)}|${width}|${height}`;
+    if (key !== landKey) {
+      landKey = key;
+      landLayer.width = canvas.width;
+      landLayer.height = canvas.height;
+      landCtx.setTransform(ratio, 0, 0, ratio, 0, 0);
+      landCtx.clearRect(0, 0, width, height);
+      const { map } = layout;
+      const spacing = land.step * view.scale;
+      const stride = spacing < 2.6 ? 2 : 1;                     // thin out when zoomed far out
+      const dot = Math.max(0.6, Math.min(2.6, spacing * stride * 0.3));
+      landCtx.fillStyle = rgba(colours.muted, 0.42);
+      landCtx.beginPath();
+      landRows.forEach((cols, r) => {
+        if (r % stride) return;
+        const [, sy] = toScreen(view, 0, land.yTop - r * rowStep);
+        if (sy < map.y - 3 || sy > map.y + map.h + 3) return;
+        const shift = r % 2 ? land.step / 2 : 0;
+        cols.forEach(c => {
+          if (c % stride) return;
+          const [sx] = toScreen(view, land.x0 + shift + c * land.step, 0);
+          if (sx < map.x - 3 || sx > map.x + map.w + 3) return;
+          if (dot > 1.9) {
+            landCtx.moveTo(sx + dot, sy);
+            landCtx.arc(sx, sy, dot, 0, 2 * Math.PI);
+          } else {
+            landCtx.rect(sx - dot, sy - dot, 2 * dot, 2 * dot);
+          }
+        });
+      });
+      landCtx.fill();
+    }
+    ctx.save();
+    ctx.setTransform(1, 0, 0, 1, 0, 0);
+    ctx.globalAlpha = alpha;
+    ctx.drawImage(landLayer, 0, 0);
+    ctx.restore();
+  }
+
+  // Quadratic arc from the hub, bent to one side; points up to fraction f
+  function arcPoints(view, p, s, f) {
+    const [x0, y0] = toScreen(view, hub.x, hub.y);
+    const [x1, y1] = toScreen(view, s.x, s.y);
+    const dx = x1 - x0;
+    const dy = y1 - y0;
+    const len = Math.hypot(dx, dy) || 1;
+    let nx = -dy / len;
+    let ny = dx / len;
+    if (ny > 0) { nx = -nx; ny = -ny; }                          // bend upwards first
+    const bend = len * 0.2 * p.side;
+    const cx = (x0 + x1) / 2 + nx * bend;
+    const cy = (y0 + y1) / 2 + ny * bend;
+    const steps = Math.max(8, Math.round(len / 6));
+    const points = [];
+    for (let i = 0; i <= steps * f; i++) {
+      const u = i / steps;
+      points.push([(1 - u) * (1 - u) * x0 + 2 * (1 - u) * u * cx + u * u * x1,
+        (1 - u) * (1 - u) * y0 + 2 * (1 - u) * u * cy + u * u * y1]);
+    }
+    return points;
+  }
+
+  function drawArcs(view, t) {
+    const focus = hover && hover.site ? hover.site : null;
+    arcs.forEach(a => {
+      const f = easeOut(clamp01((t - a.start) / (a.end - a.start)));
+      if (f <= 0) return;
+      const points = arcPoints(view, a.p, a.s, f);
+      if (points.length < 2) return;
+      const dim = focus && focus !== a.s ? 0.25 : 1;
+      ctx.strokeStyle = rgba(a.p.rgb, (focus === a.s ? 0.95 : 0.62) * dim);
+      ctx.lineWidth = focus === a.s ? 1.8 : 1.15;
+      ctx.beginPath();
+      points.forEach(([x, y], i) => (i ? ctx.lineTo(x, y) : ctx.moveTo(x, y)));
+      ctx.stroke();
+      if (f < 1) {                                                // travelling head
+        const [x, y] = points[points.length - 1];
+        ctx.fillStyle = rgba(a.p.rgb, 0.35);
+        ctx.beginPath(); ctx.arc(x, y, 4.5, 0, 2 * Math.PI); ctx.fill();
+        ctx.fillStyle = rgba(a.p.rgb, 1);
+        ctx.beginPath(); ctx.arc(x, y, 1.8, 0, 2 * Math.PI); ctx.fill();
+      }
+    });
+  }
+
+  // One mark per project: filled (beneficiary) or ring (partner), as a
+  // whole dot or as the left or right half when the place is in both
+  function drawMark(x, y, r, p, role, half, alpha) {
+    if (r < 1) return;
+    const [a0, a1] = half === 'left' ? [Math.PI / 2, 1.5 * Math.PI]
+      : half === 'right' ? [-Math.PI / 2, Math.PI / 2] : [0, 2 * Math.PI];
+    ctx.beginPath();
+    if (role === 'partner') {
+      ctx.arc(x, y, r - 0.8, a0, a1);
+      ctx.strokeStyle = rgba(p.rgb, alpha);
+      ctx.lineWidth = 1.6;
+      ctx.stroke();
+    } else {
+      if (half) ctx.moveTo(x, y);
+      ctx.arc(x, y, r, a0, a1);
+      ctx.closePath();
+      ctx.fillStyle = rgba(p.rgb, alpha);
+      ctx.fill();
+    }
+  }
+
+  function drawSites(view, t, fontSize) {
+    const { map, narrow } = layout;
+    const r = narrow ? 3.4 : 4.2;
+    sites.forEach(s => {
+      const shown = projects.map(p => (s.role[p.id] ? arrivedAt(p, s, t) : 0));
+      const scale = Math.max(...shown);
+      if (scale <= 0) return;
+      const [x, y] = toScreen(view, s.x, s.y);
+      if (x < map.x - 10 || x > map.x + map.w + 10 || y < map.y - 10 || y > map.y + map.h + 10) return;
+      const both = shown[0] > 0 && shown[1] > 0;
+      const dim = hover && hover.site && hover.site !== s ? 0.45 : 1;
+      const rr = (s === hub ? r * 1.45 : r) * (hover && hover.site === s ? 1.35 : 1);
+
+      // Dark halo so the mark stands out over land and arcs
+      ctx.fillStyle = rgba(colours.paper, 0.85);
+      ctx.beginPath(); ctx.arc(x, y, rr * easeOut(scale) + 1.6, 0, 2 * Math.PI); ctx.fill();
+      projects.forEach((p, n) => {
+        if (shown[n] <= 0) return;
+        drawMark(x, y, rr * easeOut(shown[n]), p, s.role[p.id], both ? (n === 0 ? 'left' : 'right') : null, dim);
+      });
+
+      if (s === hub) {                                            // coordinator: a ring that breathes
+        const phase = Number.isFinite(t) ? (t % 1800) / 1800 : 1;
+        ctx.strokeStyle = rgba(colours.ink, (Number.isFinite(t) ? 0.5 * (1 - phase) : 0.35) * dim);
+        ctx.lineWidth = 1;
+        ctx.beginPath(); ctx.arc(x, y, rr + 3 + (Number.isFinite(t) ? 9 * phase : 3), 0, 2 * Math.PI); ctx.stroke();
+      }
+
+      if (s.label && scale > 0.5) {
+        ctx.font = `${s === hub ? 500 : 400} ${fontSize}px ${colours.sans}`;
+        ctx.fillStyle = rgba(s === hub ? colours.ink : colours.muted, dim * clamp01((scale - 0.5) * 2));
+        const right = x + rr + 6 + ctx.measureText(s.label).width < map.x + map.w;
+        const lx = right ? x + rr + 6 : x - rr - 6;
+        ctx.textAlign = right ? 'left' : 'right';
+        ctx.textBaseline = 'middle';
+        ctx.strokeStyle = rgba(colours.paper, 0.85 * dim);         // dark edge over the land dots
+        ctx.lineWidth = 3;
+        ctx.lineJoin = 'round';
+        ctx.strokeText(s.label, lx, y);
+        ctx.fillText(s.label, lx, y);
+      }
+    });
+  }
+
+  function roundedRect(x, y, w, h, radius) {
+    ctx.beginPath();
+    ctx.moveTo(x + radius, y);
+    ctx.arcTo(x + w, y, x + w, y + h, radius);
+    ctx.arcTo(x + w, y + h, x, y + h, radius);
+    ctx.arcTo(x, y + h, x, y, radius);
+    ctx.arcTo(x, y, x + w, y, radius);
+    ctx.closePath();
+  }
+
+  const millions = v => `€${(v / 1e6).toFixed(2)} million`;
+
+  // Logo on a white card, title, EU contribution counting up, consortium
+  function drawBlock(p, b, t, fontSize) {
+    const { narrow } = layout;
+    const k = easeOut(clamp01((t - T_BLOCK[p.n]) / 600));
+    if (k <= 0) return;
+    const lift = (1 - k) * 10;
+    const focused = hover && hover.project === p;
+
+    ctx.save();
+    ctx.globalAlpha = k;
+    roundedRect(b.x, b.y + lift, b.w, b.cardH, 5);
+    ctx.fillStyle = '#ffffff';
+    ctx.fill();
+    if (focused) {
+      ctx.strokeStyle = rgba(p.rgb, 1);
+      ctx.lineWidth = 2;
+      ctx.stroke();
+    }
+    if (p.image.complete && p.image.naturalWidth) {
+      const pad = narrow ? 6 : 8;
+      const w = b.w - 2 * pad;
+      const h = Math.min(b.cardH - 2 * pad, (w * p.image.naturalHeight) / p.image.naturalWidth);
+      const iw = (h * p.image.naturalWidth) / p.image.naturalHeight;
+      ctx.drawImage(p.image, b.x + (b.w - iw) / 2, b.y + lift + (b.cardH - h) / 2, iw, h);
+    }
+
+    let y = b.y + lift + b.cardH;
+    if (b.title) {
+      ctx.font = `italic 300 ${TITLE_SIZE}px ${colours.serif}`;
+      ctx.fillStyle = rgba(colours.ink, 0.92);
+      ctx.textAlign = 'left';
+      ctx.textBaseline = 'alphabetic';
+      y += 10;
+      b.title.forEach(line => { y += TITLE_LINE; ctx.fillText(line, b.x, y); });
+    }
+
+    // EU contribution, counting up
+    const count = easeOut(clamp01((t - T_NET[p.n]) / COUNT_SPAN));
+    const budgetSize = narrow ? 19 : 26;
+    ctx.font = `300 ${budgetSize}px ${colours.serif}`;
+    ctx.fillStyle = rgba(colours.ink, 1);
+    ctx.textAlign = 'left';
+    ctx.textBaseline = 'alphabetic';
+    y += budgetSize + (narrow ? 6 : 8);
+    ctx.fillText(millions(p.contribution * count), b.x, y);
+    ctx.fillStyle = rgba(p.rgb, 1);
+    ctx.fillRect(b.x, y + 6, Math.min(b.w, narrow ? 28 : 40) * count, 2);
+
+    // Consortium, once the count is done
+    const facts = clamp01((t - T_NET[p.n] - COUNT_SPAN + 300) / 500);
+    ctx.globalAlpha = k * facts;
+    ctx.font = `400 ${fontSize}px ${colours.sans}`;
+    ctx.fillStyle = rgba(colours.muted, 1);
+    const consortium = `${p.beneficiaries} beneficiaries, ${p.partners} partners, ${p.countries} countries`;
+    if (narrow) {
+      ctx.fillText(`${p.beneficiaries + p.partners} organisations, ${p.countries} countries`, b.x, y + 22);
+    } else {
+      ctx.fillText(`EU contribution, ${p.years}`, b.x, y + 22);
+      ctx.fillStyle = rgba(colours.ink, 1);
+      ctx.fillText(consortium, b.x, y + 38);
+    }
+    ctx.restore();
+    b.box = { x: b.x, y: b.y, w: b.w, h: y + 42 - b.y };
+  }
+
+  // EU emblem (12 gold stars on blue) with the funding statement
+  function drawEmblem(x, y, h, fontSize, alpha) {
+    const w = h * 1.5;
+    ctx.save();
+    ctx.globalAlpha = alpha;
+    ctx.fillStyle = '#003399';
+    ctx.fillRect(x, y, w, h);
+    ctx.fillStyle = '#FFCC00';
+    for (let i = 0; i < 12; i++) {
+      const a = (i * Math.PI) / 6;
+      const sx = x + w / 2 + Math.sin(a) * h / 3;
+      const sy = y + h / 2 - Math.cos(a) * h / 3;
+      const outer = h / 18;
+      ctx.beginPath();
+      for (let j = 0; j < 10; j++) {
+        const rr = j % 2 ? outer * 0.382 : outer;
+        const b = -Math.PI / 2 + (j * Math.PI) / 5;
+        ctx[j ? 'lineTo' : 'moveTo'](sx + Math.cos(b) * rr, sy + Math.sin(b) * rr);
+      }
+      ctx.closePath();
+      ctx.fill();
+    }
+    ctx.font = `400 ${fontSize}px ${colours.sans}`;
+    ctx.fillStyle = rgba(colours.ink, 1);
+    ctx.textAlign = 'left';
+    ctx.textBaseline = 'middle';
+    ctx.fillText('Funded by the European Union', x + w + 7, y + h / 2);
+    ctx.restore();
+  }
+
+  // Key to the marks, on a dark backing in the map's lower left corner
+  function drawLegend(x, y, fontSize, alpha) {
+    ctx.save();
+    ctx.globalAlpha = alpha;
+    ctx.font = `400 ${fontSize}px ${colours.sans}`;
+    ctx.textAlign = 'left';
+    ctx.textBaseline = 'middle';
+    const w = 48 + ctx.measureText('beneficiary').width + ctx.measureText('associated partner').width;
+    ctx.fillStyle = rgba(colours.paper, 0.85);
+    ctx.fillRect(x - 2, y - 9, w, 18);
+    drawMark(x + 4, y, 4, { rgb: colours.muted }, 'beneficiary', null, 1);
+    ctx.fillStyle = rgba(colours.muted, 1);
+    ctx.fillText('beneficiary', x + 13, y);
+    const x2 = x + 22 + ctx.measureText('beneficiary').width;
+    drawMark(x2 + 4, y, 4, { rgb: colours.muted }, 'partner', null, 1);
+    ctx.fillStyle = rgba(colours.muted, 1);
+    ctx.fillText('associated partner', x2 + 13, y);
+    ctx.restore();
+  }
+
+  function draw(t) {
+    const { width, height, ratio } = size;
+    if (!layout || width < 20) return;
+    ctx.setTransform(ratio, 0, 0, ratio, 0, 0);
+    ctx.clearRect(0, 0, width, height);
+    const { map, narrow, blocks } = layout;
+    const fontSize = narrow ? 10 : 11;
+    const view = viewAt(t);
+
+    ctx.save();
+    ctx.beginPath();
+    ctx.rect(map.x, map.y, map.w, map.h);
+    ctx.clip();
+    drawLand(view, easeOut(clamp01(t / T_LAND)));
+    drawArcs(view, t);
+    drawSites(view, t, fontSize);
+    ctx.restore();
+
+    projects.forEach((p, n) => drawBlock(p, blocks[n], t, fontSize));
+
+    const legendAlpha = clamp01((t - T_NET[0]) / 600);
+    drawLegend(map.x + 4, map.y + map.h - 11, fontSize, legendAlpha);
+    if (!narrow) drawEmblem(0, height - 20, 18, fontSize, legendAlpha);
+  }
+
+
+  /* --- Animation -------------------------------------------------- */
+
+  function frame(time) {
+    if (!t0) t0 = time;
+    now = time - t0;
+    draw(now);
+    if (now < T_END) {
+      frameId = requestAnimationFrame(frame);
+    } else {
+      now = Infinity;
+      draw(now);
+    }
+  }
+
+  // Plays the animation once (or shows the end state when motion is reduced)
+  function start() {
+    cancelAnimationFrame(frameId);
+    t0 = 0;
+    hover = null;
+    readout.textContent = defaultReadout;
+    now = reduceMotion ? Infinity : 0;
+    resize();
+    if (!reduceMotion) frameId = requestAnimationFrame(frame);
+  }
+
+  function stop() {
+    cancelAnimationFrame(frameId);
+  }
+
+
+  /* --- Readout: the place or project under the pointer ------------ */
+
+  const ROLE_WORD = { coordinator: 'coordinator', beneficiary: 'beneficiary', partner: 'associated partner' };
+
+  function describeRoles(o) {
+    const roles = projects.filter(p => o[p.id]);
+    if (roles.length > 1 && roles.every(p => o[p.id] === o[roles[0].id])) {
+      const role = o[roles[0].id];
+      return `${ROLE_WORD[role]} ${role === 'coordinator' ? 'of' : 'in'} ${roles.map(p => p.id).join(' and ')}`;
+    }
+    return roles.map(p => `${p.id} ${ROLE_WORD[o[p.id]]}`).join(', ');
+  }
+
+  const describeSite = s => `${s.place}, ${s.country}. ` +
+    s.organisations.map(o => `${o.name}: ${describeRoles(o)}`).join('; ');
+
+  const describeProject = p => `${p.id}, ${p.action}: ${p.title}. ${p.period}` +
+    `${p.people ? `, ${p.people}` : ''}, EU contribution €${p.contribution.toLocaleString('en-GB', { minimumFractionDigits: 0, maximumFractionDigits: 2 })}.`;
+
+  // Keep the caption the same height whatever it says
+  const longestReadouts = [...sites.map(describeSite), ...projects.map(describeProject)]
+    .sort((a, b) => b.length - a.length).slice(0, 6);
+
+  function reserveReadoutSpace() {
+    const width = readout.clientWidth;
+    if (!width) return;
+    const probe = readout.cloneNode(false);
+    probe.removeAttribute('id');
+    probe.setAttribute('aria-hidden', 'true');
+    probe.style.cssText = `position: absolute; visibility: hidden; width: ${width}px; min-height: 0`;
+    readout.after(probe);
+    let tallest = 0;
+    [defaultReadout, ...longestReadouts].forEach(text => {
+      probe.textContent = text;
+      tallest = Math.max(tallest, probe.offsetHeight);
+    });
+    probe.remove();
+    readout.style.minHeight = `${tallest}px`;
+  }
+
+  function showItem(event) {
+    if (now !== Infinity) return;
+    const box = canvas.getBoundingClientRect();
+    const px = event.clientX - box.left;
+    const py = event.clientY - box.top;
+    const view = viewAt(now);
+    hover = null;
+
+    const near = sites.map(s => {
+      const [x, y] = toScreen(view, s.x, s.y);
+      return { s, d: Math.hypot(x - px, y - py) };
+    }).filter(n => n.d <= 9).sort((a, b) => a.d - b.d)[0];
+    const block = layout.blocks.find(b => b.box && px >= b.box.x && px <= b.box.x + b.box.w &&
+      py >= b.box.y && py <= b.box.y + b.box.h);
+
+    if (near) {
+      hover = { site: near.s };
+      readout.textContent = describeSite(near.s);
+    } else if (block) {
+      const p = projects[layout.blocks.indexOf(block)];
+      hover = { project: p };
+      readout.textContent = describeProject(p);
+    }
+    if (!hover) readout.textContent = defaultReadout;
+    draw(now);
+  }
+
+  function clearItem() {
+    if (!hover) return;
+    hover = null;
+    readout.textContent = defaultReadout;
+    if (now === Infinity) draw(now);
+  }
+
+  canvas.addEventListener('pointermove', showItem);
+  canvas.addEventListener('pointerdown', showItem);
+  canvas.addEventListener('pointerleave', clearItem);
+  new ResizeObserver(() => { if (!canvas.closest('[hidden]')) resize(); }).observe(canvas);
+
+  reserveReadoutSpace();
+  return { start, stop };
 }
 
 

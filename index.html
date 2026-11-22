@@ -22,11 +22,13 @@
   <link rel="icon" href="favicon.svg" type="image/svg+xml">
 
   <link rel="stylesheet" href="fonts.css?v=20261121a">
-  <link rel="stylesheet" href="style.css?v=20261122a">
+  <link rel="stylesheet" href="style.css?v=20261122b">
   <script src="data/cpx-spots.js?v=20261121b" defer></script>
   <script src="data/cpx-map.js?v=20261121b" defer></script>
+  <script src="data/projects.js?v=20261122a" defer></script>
+  <script src="data/land.js?v=20261122a" defer></script>
   <script src="data/news.js" defer></script>
-  <script src="script.js?v=20261122c" defer></script>
+  <script src="script.js?v=20261122d" defer></script>
 
   <script type="application/ld+json">
   {
@@ -81,15 +83,35 @@
       </p>
     </div>
 
-    <!-- Hero figure: the crystal map and its pressure–temperature panel,
-         drawn by script.js from the files in data/. -->
-    <figure class="hero-figure" id="hero-figure">
-      <canvas id="crystal-map" width="700" height="525" role="img" aria-label="Left: trace-element map of a clinopyroxene crystal from the 2021 Tajogaite eruption, La Palma, shown for chromium, scandium and zirconium, then coloured by three clusters, shown in turn: the evolved core, the broad chromium-rich zone grown from basanite recharge, and the outer rim. Right: depth against temperature of crystallisation for 149 spot analyses in the same three clusters, from a machine-learning thermobarometer, drawn as a density contour and a centroid for each cluster. The evolved-core cluster centres at about 26 kilometres and 1050 degrees Celsius; the recharge and outer-rim clusters centre in the crust, at about 8 and 4 kilometres and 1100 and 1090 degrees."></canvas>
-      <figcaption>
-        <p class="figure-readout" id="figure-readout">Point at the figure to read the values.</p>
-        <p class="figure-note">Clusters in a Tajogaite 2021 clinopyroxene, La Palma, and their pressure–temperature conditions from machine-learning thermobarometry (<a href="https://doi.org/10.1038/s41467-026-77213-9">Caracciolo et al., 2026, <i>Nature Communications</i></a>).</p>
-      </figcaption>
-    </figure>
+    <!-- Hero figures, drawn by script.js from the files in data/: the crystal map
+         with its pressure–temperature panel, and the REALISE and REALI3SE map. -->
+    <div class="hero-figures">
+      <!-- Two figures under tabs; script.js shows the tabs and plays each figure when chosen -->
+      <div class="figure-tabs" role="tablist" aria-label="Figures" hidden>
+        <button type="button" role="tab" id="tab-crystal" aria-selected="true" aria-controls="panel-crystal">Tajogaite 2021 clinopyroxene</button>
+        <button type="button" role="tab" id="tab-projects" aria-selected="false" aria-controls="panel-projects" tabindex="-1">REALISE and REALI3SE</button>
+      </div>
+      <div class="figure-stack">
+        <div class="figure-panel" id="panel-crystal" role="tabpanel" aria-labelledby="tab-crystal">
+          <figure class="hero-figure" id="hero-figure">
+            <canvas id="crystal-map" width="700" height="525" role="img" aria-label="Left: trace-element map of a clinopyroxene crystal from the 2021 Tajogaite eruption, La Palma, shown for chromium, scandium and zirconium, then coloured by three clusters, shown in turn: the evolved core, the broad chromium-rich zone grown from basanite recharge, and the outer rim. Right: depth against temperature of crystallisation for 149 spot analyses in the same three clusters, from a machine-learning thermobarometer, drawn as a density contour and a centroid for each cluster. The evolved-core cluster centres at about 26 kilometres and 1050 degrees Celsius; the recharge and outer-rim clusters centre in the crust, at about 8 and 4 kilometres and 1100 and 1090 degrees."></canvas>
+            <figcaption>
+              <p class="figure-readout" id="figure-readout">Point at the figure to read the values.</p>
+              <p class="figure-note">Clusters in a Tajogaite 2021 clinopyroxene, La Palma, and their pressure–temperature conditions from machine-learning thermobarometry (<a href="https://doi.org/10.1038/s41467-026-77213-9">Caracciolo et al., 2026, <i>Nature Communications</i></a>).</p>
+            </figcaption>
+          </figure>
+        </div>
+        <div class="figure-panel" id="panel-projects" role="tabpanel" aria-labelledby="tab-projects" hidden>
+          <figure class="hero-figure">
+            <canvas id="projects-map" width="700" height="525" role="img" aria-label="REALISE and REALI3SE, two Marie Skłodowska-Curie Actions coordinated by the University of Perugia. Left: the two project logos and titles, with their EU contributions, 4.36 million euros for the REALISE Doctoral Network and 1.17 million euros for the REALI3SE Staff Exchanges, both 2026 to 2030. Right: a map of the consortia, linked by arcs to the coordinator in Perugia. REALISE joins 8 beneficiaries and 11 associated partners in 9 countries, mostly in Europe, with a partner in the United States. REALI3SE joins 11 beneficiaries in Europe with 5 associated partners in the United States, Colombia, Argentina, the Democratic Republic of the Congo and South Africa."></canvas>
+            <figcaption>
+              <p class="figure-readout" id="projects-readout">Point at a place or a logo to read the details.</p>
+              <p class="figure-note">Two Marie Skłodowska-Curie Actions that I coordinate, with consortia and EU contributions as listed by CORDIS. <a href="#realise">About the projects</a></p>
+            </figcaption>
+          </figure>
+        </div>
+      </div>
+    </div>
   </div>
 </header>
 

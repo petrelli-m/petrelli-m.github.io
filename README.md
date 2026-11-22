@@ -7,10 +7,14 @@ Plain HTML, CSS and JavaScript. No framework, no build step.
 | `index.html`  | All the text: every section, every publication                   |
 | `style.css`   | Layout and colours (basalt and pumice)                           |
 | `fonts.css`, `fonts/` | Spectral and Schibsted Grotesk, served from this site (see below) |
-| `script.js`   | Hero figure (crystal map), publication search, navigation        |
+| `script.js`   | Hero figures (crystal map, projects map), publication search, navigation |
 | `data/cpx-spots.js` | La Palma clinopyroxene spots: trace elements, clusters, ML pressure and temperature |
 | `data/cpx-map.js`   | Cr, Sc, Zr and cluster map of a Tajogaite 2021 crystal           |
 | `tools/build_data.py` | Rebuilds the two data files from the paper's repository        |
+| `data/projects.js` | REALISE and REALI3SE: titles, EU contributions, organisations by place (edit by hand) |
+| `data/land.js` | Land of the projects map as dots (Natural Earth 1:50m, public domain) |
+| `tools/build_land.mjs` | Rebuilds `data/land.js` (needs Node and three npm packages, see the file) |
+| `logos/`      | REALISE and REALI3SE logos, from the project websites            |
 | `data/news.js` | Latest news of realise-dn.eu and reali3se.eu, shown under Now (written automatically) |
 | `tools/fetch_news.py` | Reads the two websites' RSS feeds and rewrites `data/news.js` |
 | `.github/workflows/news.yml` | Runs `tools/fetch_news.py` on GitHub every morning |
@@ -36,6 +40,10 @@ Plain HTML, CSS and JavaScript. No framework, no build step.
 - **After editing `fonts.css`, `style.css`, `script.js`, a data file or a photo:** change the `?v=` value where
   `index.html` links to it (for example `style.css?v=20261121b` → `style.css?v=20261125`). Browsers
   keep copies for 10 minutes; a new value makes them fetch the new file at once.
+- **Projects figure:** the second tab of the hero. Its content is in `data/projects.js`: each
+  place lists its organisations with their role in each project (`coordinator`, `beneficiary` or
+  `partner`). Add or change an organisation there; the counts of beneficiaries, partners and
+  countries, the map and the readout follow. Keep the `?v=` value in step as for other data files.
 - **Project news:** every morning GitHub runs `tools/fetch_news.py`, which reads the RSS feeds of
   realise-dn.eu and reali3se.eu and rewrites `data/news.js`; when something is new it commits the
   file and the site republishes itself. The page shows the four newest items (`NEWS_SHOWN` in

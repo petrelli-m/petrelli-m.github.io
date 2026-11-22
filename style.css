@@ -361,6 +361,64 @@ a:hover {
   background: var(--rule);
 }
 
+/* Two figures under tabs (shown by script.js). The panels share one grid
+   cell, so the hero keeps its height whichever figure is shown. */
+.figure-tabs {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0 1.75rem;
+  margin-bottom: 1rem;
+  border-bottom: 1px solid var(--rule);
+}
+
+.figure-tabs [role="tab"] {
+  margin: 0 0 -1px;
+  padding: 0.4rem 0 0.6rem;
+  border: 0;
+  border-bottom: 2px solid transparent;
+  background: none;
+  color: var(--muted);
+  font-family: var(--sans);
+  font-size: var(--fs-ui);
+  font-weight: 500;
+  line-height: 1.3;
+  cursor: pointer;
+}
+
+.figure-tabs [role="tab"]:hover,
+.figure-tabs [role="tab"][aria-selected="true"] {
+  color: var(--ink);
+}
+
+.figure-tabs [role="tab"][aria-selected="true"] {
+  border-bottom-color: var(--ink);
+}
+
+@media (max-width: 480px) {
+  .figure-tabs {
+    gap: 0 1.1rem;
+  }
+
+  .figure-tabs [role="tab"] {
+    font-size: var(--fs-meta);
+  }
+}
+
+.figure-stack {
+  display: grid;
+}
+
+.figure-panel {
+  grid-area: 1 / 1;
+  min-width: 0;
+}
+
+/* A hidden panel keeps its place (overriding the general [hidden] rule) */
+.figure-panel[hidden] {
+  display: block !important;
+  visibility: hidden;
+}
+
 .hero-figure canvas {
   display: block;
   width: 100%;
