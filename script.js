@@ -765,13 +765,18 @@ function createCrystalMap(canvas, readout, defaultReadout, spotData, mapData) {
 
   input.addEventListener('input', update);
 
+  // Each word typed must match the start of a word in the entry, so
+  // "nature" finds "Nature Communications" but not "signature"
+  const escape = s => s.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+
   function update() {
-    const terms = fold(input.value).split(/\s+/).filter(Boolean);
+    const terms = fold(input.value).split(/\s+/).filter(Boolean)
+      .map(term => new RegExp(`(^|[^a-z0-9])${escape(term)}`));
     let shown = 0;
 
     items.forEach(li => {
       const match = (filter === 'all' || li.dataset.type === filter) &&
-        terms.every(term => text.get(li).includes(term));
+        terms.every(term => term.test(text.get(li)));
       li.hidden = !match;
       if (match) shown++;
     });
