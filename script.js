@@ -62,41 +62,51 @@ function fitCanvas(canvas) {
 
 
 /* 1. HERO FIGURES ---------------------------------------------------
-   Draws the crystal map once the page has painted and plays it once.
-   With the projects data loaded, shows the two tabs: choosing a tab
-   shows its figure and plays its animation. */
+   Once the page has painted, shows the two tabs and plays the figure of
+   the selected one (REALISE and REALI3SE at startup); choosing the other
+   tab shows its figure and plays its animation. */
 
 (function heroFigures() {
+  const tablist = document.querySelector('.figure-tabs');
+  const tabs = tablist ? Array.from(tablist.querySelectorAll('[role="tab"]')) : [];
+  const panelOf = tab => document.getElementById(tab.getAttribute('aria-controls'));
   const crystal = { canvas: document.getElementById('crystal-map'), readout: document.getElementById('figure-readout') };
   const projects = { canvas: document.getElementById('projects-map'), readout: document.getElementById('projects-readout') };
-  const tablist = document.querySelector('.figure-tabs');
   const haveCrystal = crystal.canvas && crystal.readout && typeof CPX_SPOTS !== 'undefined' && typeof CPX_MAP !== 'undefined';
   const haveProjects = projects.canvas && projects.readout && typeof PROJECTS !== 'undefined' && typeof LAND !== 'undefined';
 
   const fontsReady = document.fonts ? document.fonts.ready : Promise.resolve();
   fontsReady.then(() => requestAnimationFrame(() => setTimeout(() => {
     const figures = new Map();
+    if (haveProjects) {
+      figures.set('tab-projects', createProjectsMap(projects.canvas, projects.readout, projects.readout.textContent, PROJECTS, LAND));
+    }
     if (haveCrystal) {
       figures.set('tab-crystal', createCrystalMap(crystal.canvas, crystal.readout, crystal.readout.textContent, CPX_SPOTS, CPX_MAP));
-      figures.get('tab-crystal').start();
     }
-    if (!haveCrystal || !haveProjects || !tablist) return;
-    figures.set('tab-projects', createProjectsMap(projects.canvas, projects.readout, projects.readout.textContent, PROJECTS, LAND));
+    if (!figures.size || !tabs.length) return;
 
-    // Tabs: click, or arrow keys, Home and End when a tab has focus.
-    // The chosen figure plays its animation; the other one stops.
-    const tabs = Array.from(tablist.querySelectorAll('[role="tab"]'));
+    // Show one figure, play its animation and stop the other one
     function select(tab, moveFocus) {
       tabs.forEach(t => {
         const on = t === tab;
         t.setAttribute('aria-selected', String(on));
         t.tabIndex = on ? 0 : -1;
-        document.getElementById(t.getAttribute('aria-controls')).hidden = !on;
-        if (!on) figures.get(t.id).stop();
+        panelOf(t).hidden = !on;
+        if (!on && figures.has(t.id)) figures.get(t.id).stop();
       });
       if (moveFocus) tab.focus();
       figures.get(tab.id).start();
     }
+
+    // Only one figure could be drawn: show it, without tabs
+    if (figures.size === 1) {
+      select(tabs.find(t => figures.has(t.id)), false);
+      return;
+    }
+
+    // Tabs: click, or arrow keys, Home and End when a tab has focus.
+    // The tab marked aria-selected="true" in index.html plays at startup.
     tabs.forEach((tab, i) => {
       tab.addEventListener('click', () => {
         if (tab.getAttribute('aria-selected') !== 'true') select(tab, false);
@@ -109,6 +119,7 @@ function fitCanvas(canvas) {
       });
     });
     tablist.hidden = false;
+    select(tabs.find(t => t.getAttribute('aria-selected') === 'true') || tabs[0], false);
   }, 0)));
 })();
 
@@ -865,6 +876,7 @@ function createCrystalMap(canvas, readout, defaultReadout, spotData, mapData) {
   canvas.addEventListener('pointerleave', clearItem);
   new ResizeObserver(() => { if (!canvas.closest('[hidden]')) resize(); }).observe(canvas);
 
+  reserveReadoutSpace();
   return { start, stop: () => cancelAnimationFrame(frameId) };
 }
 
